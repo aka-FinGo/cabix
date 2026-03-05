@@ -24,22 +24,26 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
   bool _isLoading = false;
 
   Future<void> _handleSave() async {
-    if (!_formKey.currentState!.validate()) return;
-    setState(() => _isLoading = true);
+  if (!_formKey.currentState!.validate()) return;
+  setState(() => _isLoading = true);
 
-    try {
-      final user = Supabase.instance.client.auth.currentUser;
-      final profile = await Supabase.instance.client.from('profiles').select('role').eq('id', user!.id).single();
-      
-      await ref.read(transactionRepoProvider).addRecord(
-        type: _mainType,
-        subCategory: _subType,
-        amount: double.parse(_amountController.text),
-        currency: _currency,
-        exchangeRate: _currency == 'USD' ? double.parse(_rateController.text) : 1.0,
-        comment: _commentController.text,
-        userRole: profile['role'],
-      );
+  try {
+    // 1. Rolni to'g'ridan-to'g'ri JWT metadatasidan olamiz (Jadvalga murojaat qilmaydi!)
+    final user = Supabase.instance.client.auth.currentUser;
+    final String userRole = user?.userMetadata?['role'] ?? 'user';
+
+    // 2. Repository orqali saqlash
+    await ref.read(transactionRepoProvider).addRecord(
+      type: _mainType,
+      subCategory: _subType,
+      amount: double.parse(_amountController.text),
+      currency: _currency,
+      exchangeRate: _currency == 'USD' ? double.parse(_rateController.text) : 1.0,
+      comment: _commentController.text,
+      userRole: userRole,
+    );
+    // ... qolgan kodlar
+
 
       ref.invalidate(statsProvider);
       ref.invalidate(pendingSalariesProvider);
