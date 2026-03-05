@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart'; // Riverpod import qilindi
 import 'core/constants.dart';
+import 'core/theme/theme_provider.dart'; // ThemeProvider import qilindi
 import 'features/auth/login_screen.dart';
-import 'features/auth/register_screen.dart'; // <-- Yangi sahifa import qilindi
+import 'features/auth/register_screen.dart';
+import 'features/dashboard/dashboard_screen.dart'; // Dashboard qo'shildi
 import 'shared/layout/main_wrapper.dart';
 
 void main() async {
@@ -14,11 +17,14 @@ void main() async {
       url: AppConstants.supabaseUrl,
       anonKey: AppConstants.supabaseAnonKey,
     );
-  } else {
-    debugPrint('DIQQAT: Supabase kalitlari topilmadi.');
   }
 
-  runApp(const CabixApp());
+  // Riverpod ishlashi uchun ProviderScope bilan o'rash shart
+  runApp(
+    const ProviderScope(
+      child: CabixApp(),
+    ),
+  );
 }
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
@@ -32,10 +38,10 @@ final GoRouter _router = GoRouter(
     final isGoingToRegister = state.matchedLocation == '/register';
 
     if (session == null && !isGoingToLogin && !isGoingToRegister) {
-      return '/login'; 
+      return '/login';
     }
     if (session != null && (isGoingToLogin || isGoingToRegister)) {
-      return '/dashboard'; 
+      return '/dashboard';
     }
     return null;
   },
@@ -54,35 +60,37 @@ final GoRouter _router = GoRouter(
       },
       branches: [
         StatefulShellBranch(routes: [
-          GoRoute(path: '/dashboard', builder: (context, state) => const Center(child: Text('Bosh Sahifa - Dashboard'))),
+          GoRoute(
+            path: '/dashboard', 
+            builder: (context, state) => const DashboardScreen(), // Haqiqiy Dashboard ulandi
+          ),
         ]),
         StatefulShellBranch(routes: [
-          GoRoute(path: '/salaries', builder: (context, state) => const Center(child: Text('Ish haqi va Tranzaksiyalar'))),
+          GoRoute(path: '/salaries', builder: (context, state) => const Center(child: Text('Ish haqi'))),
         ]),
         StatefulShellBranch(routes: [
-          GoRoute(path: '/reports', builder: (context, state) => const Center(child: Text('Hisobotlar (PDF/Excel)'))),
+          GoRoute(path: '/reports', builder: (context, state) => const Center(child: Text('Hisobotlar'))),
         ]),
         StatefulShellBranch(routes: [
-          GoRoute(path: '/settings', builder: (context, state) => const Center(child: Text('Sozlamalar va Profil'))),
+          GoRoute(path: '/settings', builder: (context, state) => const Center(child: Text('Sozlamalar'))),
         ]),
       ],
     ),
   ],
 );
 
-// ... importlar
-class CabixApp extends ConsumerWidget { // ConsumerWidget bo'lishi shart
+class CabixApp extends ConsumerWidget { // ConsumerWidget to'g'ri ulandi
   const CabixApp({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // Endi ref.watch xatosiz ishlaydi
     final themeModeNotifier = ref.watch(themeProvider.notifier);
-    final currentTheme = ref.watch(themeProvider);
 
     return MaterialApp.router(
-      title: 'Cabix',
+      title: 'Cabix - Moliya',
       debugShowCheckedModeBanner: false,
-      theme: themeModeNotifier.getThemeData(), // Dinamik mavzu
+      theme: themeModeNotifier.getThemeData(), // Dinamik mavzu ulandi
       routerConfig: _router,
     );
   }
