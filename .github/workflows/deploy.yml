@@ -5,7 +5,6 @@ on:
     branches:
       - main
 
-# GitHub Pages uchun kerakli ruxsatlar
 permissions:
   contents: read
   pages: write
@@ -30,7 +29,10 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
-      # Build va yashirin kalitlarni ulash (base-href qismi muhim!)
+      # Web platformasini avtomatik yaratish (Sizdagi xatolikning yechimi)
+      - name: Enable Web Support
+        run: flutter create . --platforms web
+
       - name: Build Web
         run: flutter build web --release --base-href "/${{ github.event.repository.name }}/" --dart-define=SUPABASE_URL=${{ secrets.SUPABASE_URL }} --dart-define=SUPABASE_ANON_KEY=${{ secrets.SUPABASE_ANON_KEY }}
 
