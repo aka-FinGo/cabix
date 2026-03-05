@@ -3,6 +3,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:go_router/go_router.dart';
 import 'core/constants.dart';
 import 'features/auth/login_screen.dart';
+import 'features/auth/register_screen.dart'; // <-- Yangi sahifa import qilindi
 import 'shared/layout/main_wrapper.dart';
 
 void main() async {
@@ -20,22 +21,21 @@ void main() async {
   runApp(const CabixApp());
 }
 
-// GoRouter konfiguratsiyasi
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
 
 final GoRouter _router = GoRouter(
   navigatorKey: _rootNavigatorKey,
   initialLocation: '/dashboard',
   redirect: (context, state) {
-    // Supabase sessiyasini tekshirish
     final session = Supabase.instance.client.auth.currentSession;
     final isGoingToLogin = state.matchedLocation == '/login';
+    final isGoingToRegister = state.matchedLocation == '/register';
 
-    if (session == null && !isGoingToLogin) {
-      return '/login'; // Kirmagan bo'lsa, loginga jo'natish
+    if (session == null && !isGoingToLogin && !isGoingToRegister) {
+      return '/login'; 
     }
-    if (session != null && isGoingToLogin) {
-      return '/dashboard'; // Kirgan bo'lsa, bosh sahifaga
+    if (session != null && (isGoingToLogin || isGoingToRegister)) {
+      return '/dashboard'; 
     }
     return null;
   },
@@ -44,7 +44,10 @@ final GoRouter _router = GoRouter(
       path: '/login',
       builder: (context, state) => const LoginScreen(),
     ),
-    // ShellRoute - O'sha siz aytgan Wrapper
+    GoRoute(
+      path: '/register',
+      builder: (context, state) => const RegisterScreen(),
+    ),
     StatefulShellRoute.indexedStack(
       builder: (context, state, navigationShell) {
         return MainWrapper(navigationShell: navigationShell);
@@ -76,10 +79,10 @@ class CabixApp extends StatelessWidget {
       title: 'Cabix - Moliya',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blueAccent),
+        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF0F6659)), // Fintech asosiy rangi
         useMaterial3: true,
       ),
-      routerConfig: _router, // Router ulandi
+      routerConfig: _router,
     );
   }
 }
