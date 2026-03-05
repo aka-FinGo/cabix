@@ -25,7 +25,6 @@ class _LoginScreenState extends State<LoginScreen> {
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
-      // Muvaffaqiyatli kirilsa, router yoki AuthGate uni Dashboard'ga o'tkazadi
     } on AuthException catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.message)));
@@ -48,22 +47,18 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
-    final primaryColor = colors.primary; // default seed colors bilan ko'k bo'ladi, lekin biz ranglarni o'zgartiramiz
-    const fintechPrimary = Color(0xFF0F6659); // image_3.png ning to'q yashil-ko'k rangi
-    const fintechAccent = Color(0xFF2EAF9B); // image_3.png ning ochroq yashil-ko'k rangi
+    const fintechPrimary = Color(0xFF0F6659);
+    const fintechAccent = Color(0xFF2EAF9B);
 
     return Scaffold(
-      backgroundColor: fintechPrimary, // Yuqori qism yashil fonda
+      backgroundColor: fintechPrimary,
       body: Stack(
         children: [
-          // 1. Yuqori qism: Fintech Illyustratsiyasi Placeholder (Yashil fonda)
-          // Bu yerga haqiqiy illyustratsiya rasmini (asset) qo'shishingiz kerak. Hozircha rangli blok.
           Positioned(
             top: 0,
             left: 0,
             right: 0,
-            height: MediaQuery.of(context).size.height * 0.45, // Ekranning 45% qismi
+            height: MediaQuery.of(context).size.height * 0.45,
             child: Container(
               color: fintechPrimary,
               child: const Center(
@@ -72,7 +67,6 @@ class _LoginScreenState extends State<LoginScreen> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      // Fintech illyustratsiyasi placeholder
                       Icon(Icons.account_balance_wallet_outlined, size: 80, color: Colors.white70),
                       SizedBox(height: 16),
                       Text(
@@ -87,9 +81,8 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           ),
           
-          // 2. Pastki qism: Modern Oq Karta (Inputlar va Tugmalar)
           Positioned(
-            top: MediaQuery.of(context).size.height * 0.4, // Ekranning 40% qismidan boshlanadi
+            top: MediaQuery.of(context).size.height * 0.4,
             left: 0,
             right: 0,
             bottom: 0,
@@ -116,7 +109,6 @@ class _LoginScreenState extends State<LoginScreen> {
                         mainAxisAlignment: MainAxisAlignment.start,
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          // 3. Cabix Logosi va Matnlar
                           const Icon(Icons.account_balance_wallet, size: 56, color: fintechPrimary),
                           const SizedBox(height: 16),
                           const Text(
@@ -132,7 +124,6 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                           const SizedBox(height: 32),
                           
-                          // 4. Input Maydonlari (Yumaloq va Soyali)
                           TextFormField(
                             controller: _emailController,
                             decoration: InputDecoration(
@@ -174,14 +165,13 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                           const SizedBox(height: 16),
                           
-                          // 5. KIRISH Tugmasi (Modern Yashil)
                           ElevatedButton(
                             onPressed: _isLoading ? null : _signIn,
                             style: ElevatedButton.styleFrom(
                               backgroundColor: fintechAccent,
                               foregroundColor: Colors.white,
                               padding: const EdgeInsets.symmetric(vertical: 16),
-                              shape: RoundedRectangleWithCornerRadii(borderRadius: BorderRadius.circular(16)),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)), // Xato tuzatildi
                               elevation: 2,
                             ),
                             child: _isLoading 
@@ -190,7 +180,6 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                           const SizedBox(height: 24),
                           
-                          // 6. Google va Apple Tugmalari Placeholders (Hozircha UI-da)
                           const Text(
                             'Yoki orqali kirish',
                             textAlign: TextAlign.center,
@@ -201,7 +190,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             children: [
                               Expanded(
                                 child: _SocialAuthButton(
-                                  iconPath: 'assets/images/google_logo.png', // asset yo'lini o'zgartiring
+                                  iconPath: 'assets/images/google_logo.png',
                                   text: 'Google',
                                   color: Colors.white,
                                   onPressed: () {},
@@ -210,7 +199,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               const SizedBox(width: 16),
                               Expanded(
                                 child: _SocialAuthButton(
-                                  iconPath: 'assets/images/apple_logo.png', // asset yo'lini o'zgartiring
+                                  iconPath: 'assets/images/apple_logo.png',
                                   text: 'Apple',
                                   color: Colors.black,
                                   onPressed: () {},
@@ -220,15 +209,13 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                           const SizedBox(height: 24),
                           
-                          // 7. Ro'yxatdan o'tish havolasi
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               const Text('Akkauntingiz yo\'qmi?'),
                               TextButton(
                                 onPressed: () {
-                                  // TODO: Ro'yxatdan o'tish sahifasiga o'tish (context.go('/signup'))
-                                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Ro\'yxatdan o\'tish sahifasi tez kunda')));
+                                  context.go('/register');
                                 },
                                 child: const Text('Ro\'yxatdan o\'ting', style: TextStyle(color: fintechPrimary)),
                               ),
@@ -249,7 +236,6 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 }
 
-// 8. Google va Apple tugmalari uchun yordamchi widget (Hozircha placeholderlar orqali)
 class _SocialAuthButton extends StatelessWidget {
   final String iconPath;
   final String text;
@@ -277,14 +263,13 @@ class _SocialAuthButton extends StatelessWidget {
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          onPressed: onPressed,
+          onTap: onPressed, // Xato tuzatildi: onPressed o'rniga onTap ishlatiladi
           borderRadius: BorderRadius.circular(16),
           child: Padding(
             padding: const EdgeInsets.all(12.0),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // Haqiqiy logo rasmi (asset) qo'shilguncha icon placeholder
                 Icon(
                   color == Colors.black ? Icons.apple : Icons.g_mobiledata,
                   size: 24,
