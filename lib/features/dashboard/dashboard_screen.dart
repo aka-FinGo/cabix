@@ -13,10 +13,9 @@ class DashboardScreen extends ConsumerWidget {
 
     return Scaffold(
       body: Container(
-        // Glass mode uchun chiroyli gradient fon
         decoration: isGlass ? const BoxDecoration(
           gradient: LinearGradient(
-            colors: [Color(0xFF667eea), Color(0xFF764ba2)],
+            colors: [Color(0xFF0F6659), Color(0xFF2EAF9B)], // Fintech ranglari
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -26,16 +25,16 @@ class DashboardScreen extends ConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildHeader(context),
+              _buildHeader(context, ref),
               const SizedBox(height: 24),
-              _buildBalanceCards(context, ref),
+              _buildBalanceCards(context),
               const SizedBox(height: 24),
               const Text("Oylik statistika", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
               const SizedBox(height: 16),
-              _buildMainChart(context, ref), // fl_chart uchun joy
+              _buildMainChart(context),
               const SizedBox(height: 24),
               const Text("Oxirgi amallar", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-              _buildRecentTransactions(context, ref),
+              _buildRecentTransactions(),
             ],
           ),
         ),
@@ -43,25 +42,23 @@ class DashboardScreen extends ConsumerWidget {
     );
   }
 
-  // 1. Header: Salomlashish va Mavzuni o'zgartirish
-  Widget _buildHeader(BuildContext context) {
+  Widget _buildHeader(BuildContext context, WidgetRef ref) {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.between,
+      mainAxisAlignment: MainAxisAlignment.spaceBetween, // XATO SHU YERDA TUZATILDI
       children: [
         const Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text("Xush kelibsiz!", style: TextStyle(fontSize: 14, color: Colors.grey)),
-            Text("Admin Foydalanuvchi", style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+            Text("Admin", style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
           ],
         ),
-        _ThemeSwitcher(), // Mavzularni almashtiruvchi tugmalar
+        _ThemeSwitcher(),
       ],
     );
   }
 
-  // 2. Balans Kartochkalari (Responsive Grid)
-  Widget _buildBalanceCards(BuildContext context, WidgetRef ref) {
+  Widget _buildBalanceCards(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
     int crossAxisCount = width > 1200 ? 3 : (width > 600 ? 2 : 1);
 
@@ -69,10 +66,10 @@ class DashboardScreen extends ConsumerWidget {
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       crossAxisCount: crossAxisCount,
-      childAspectRatio: 2.5,
+      childAspectRatio: 2.8,
       mainAxisSpacing: 16,
       crossAxisSpacing: 16,
-      children: [
+      children: const [
         _FinanceCard(title: "Umumiy balans", amount: "45,000,000 UZS", icon: Icons.account_balance_wallet, color: Colors.blue),
         _FinanceCard(title: "Oylik kirim", amount: "+12,500,000 UZS", icon: Icons.trending_up, color: Colors.green),
         _FinanceCard(title: "Oylik chiqim", amount: "-3,200,000 UZS", icon: Icons.trending_down, color: Colors.red),
@@ -80,37 +77,40 @@ class DashboardScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildMainChart(BuildContext context, WidgetRef ref) {
+  Widget _buildMainChart(BuildContext context) {
     return _GlassContainer(
       height: 250,
-      child: const Center(child: Text("Grafik (fl_chart) bu yerda bo'ladi")),
+      width: double.infinity,
+      child: const Center(child: Text("Grafik (fl_chart) tayyorlanmoqda...")),
     );
   }
 
-  Widget _buildRecentTransactions(BuildContext context, WidgetRef ref) {
+  Widget _buildRecentTransactions() {
     return ListView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       itemCount: 5,
-      itemBuilder: (context, index) => ListTile(
-        leading: const CircleAvatar(child: Icon(Icons.shopping_cart)),
-        title: const Text("Oziq-ovqat"),
-        subtitle: const Text("Bugun, 14:20"),
-        trailing: const Text("-150,000 UZS", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.red)),
+      itemBuilder: (context, index) => Card(
+        elevation: 0,
+        color: Colors.transparent,
+        child: ListTile(
+          contentPadding: EdgeInsets.zero,
+          leading: const CircleAvatar(backgroundColor: Color(0xFFF1F1F1), child: Icon(Icons.shopping_cart, size: 20, color: Colors.black)),
+          title: const Text("Oziq-ovqat", style: TextStyle(fontWeight: FontWeight.w600)),
+          subtitle: const Text("Bugun, 14:20", style: TextStyle(fontSize: 12)),
+          trailing: const Text("-150,000 UZS", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.red)),
+        ),
       ),
     );
   }
 }
 
-// ---------------------------------------------------------
-// YORDAMCHI WIDGETLAR (Glass Effektlari bilan)
-// ---------------------------------------------------------
-
 class _GlassContainer extends ConsumerWidget {
   final Widget child;
   final double? height;
+  final double? width;
 
-  const _GlassContainer({required this.child, this.height});
+  const _GlassContainer({required this.child, this.height, this.width});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -118,11 +118,12 @@ class _GlassContainer extends ConsumerWidget {
     if (theme != AppThemeMode.glass) {
       return Container(
         height: height,
+        width: width,
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: Theme.of(context).cardColor,
           borderRadius: BorderRadius.circular(20),
-          boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10)],
+          border: Border.all(color: Colors.grey.withOpacity(0.1)),
         ),
         child: child,
       );
@@ -131,14 +132,15 @@ class _GlassContainer extends ConsumerWidget {
     return ClipRRect(
       borderRadius: BorderRadius.circular(24),
       child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+        filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
         child: Container(
           height: height,
+          width: width,
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.2),
+            color: Colors.white.withOpacity(0.15),
             borderRadius: BorderRadius.circular(24),
-            border: Border.all(color: Colors.white.withOpacity(0.3)),
+            border: Border.all(color: Colors.white.withOpacity(0.2)),
           ),
           child: child,
         ),
@@ -161,18 +163,20 @@ class _FinanceCard extends StatelessWidget {
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(color: color.withOpacity(0.1), borderRadius: BorderRadius.circular(12)),
-            child: Icon(icon, color: color),
+            child: Icon(icon, color: color, size: 24),
           ),
-          const SizedBox(width: 16),
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(title, style: const TextStyle(color: Colors.grey, fontSize: 13)),
-              Text(amount, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-            ],
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(title, style: const TextStyle(color: Colors.grey, fontSize: 12), maxLines: 1, overflow: TextOverflow.ellipsis),
+                Text(amount, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16), maxLines: 1, overflow: TextOverflow.ellipsis),
+              ],
+            ),
           )
         ],
       ),
@@ -185,9 +189,9 @@ class _ThemeSwitcher extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return Row(
       children: [
-        IconButton(onPressed: () => ref.read(themeProvider.notifier).setTheme(AppThemeMode.standard), icon: const Icon(Icons.wb_sunny_outlined)),
-        IconButton(onPressed: () => ref.read(themeProvider.notifier).setTheme(AppThemeMode.dark), icon: const Icon(Icons.nightlight_outlined)),
-        IconButton(onPressed: () => ref.read(themeProvider.notifier).setTheme(AppThemeMode.glass), icon: const Icon(Icons.auto_awesome_motion)),
+        IconButton(onPressed: () => ref.read(themeProvider.notifier).setTheme(AppThemeMode.standard), icon: const Icon(Icons.light_mode_outlined, size: 20)),
+        IconButton(onPressed: () => ref.read(themeProvider.notifier).setTheme(AppThemeMode.dark), icon: const Icon(Icons.dark_mode_outlined, size: 20)),
+        IconButton(onPressed: () => ref.read(themeProvider.notifier).setTheme(AppThemeMode.glass), icon: const Icon(Icons.blur_on, size: 20)),
       ],
     );
   }
