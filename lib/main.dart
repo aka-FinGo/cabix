@@ -70,18 +70,19 @@ final GoRouter _router = GoRouter(
   ],
 );
 
-class CabixApp extends StatelessWidget {
+// ... importlar
+class CabixApp extends ConsumerWidget { // ConsumerWidget bo'lishi shart
   const CabixApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final themeModeNotifier = ref.watch(themeProvider.notifier);
+    final currentTheme = ref.watch(themeProvider);
+
     return MaterialApp.router(
-      title: 'Cabix - Moliya',
+      title: 'Cabix',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF0F6659)), // Fintech asosiy rangi
-        useMaterial3: true,
-      ),
+      theme: themeModeNotifier.getThemeData(), // Dinamik mavzu
       routerConfig: _router,
     );
   }
