@@ -1,17 +1,26 @@
-name: Flutter Web Deploy
+name: Flutter Web Deploy to Pages
 
 on:
   push:
     branches:
-      - main # Asosiy branchga kod qo'shilganda ishga tushadi
+      - main
+
+# GitHub Pages uchun kerakli ruxsatlar
+permissions:
+  contents: read
+  pages: write
+  id-token: write
 
 jobs:
   build_and_deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
@@ -21,13 +30,18 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
-      # Flutter build jarayonida GitHub Secrets'dagi kalitlar kodga ulanadi
+      # base-href juda muhim, usiz oq ekran qolib ketadi
       - name: Build Web
-        run: flutter build web --release --dart-define=SUPABASE_URL=${{ secrets.SUPABASE_URL }} --dart-define=SUPABASE_ANON_KEY=${{ secrets.SUPABASE_ANON_KEY }}
+        run: flutter build web --release --base-href "/${{ github.event.repository.name }}/" --dart-define=SUPABASE_URL=${{ secrets.SUPABASE_URL }} --dart-define=SUPABASE_ANON_KEY=${{ secrets.SUPABASE_ANON_KEY }}
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: 'build/web'
 
       - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./build/web
-          
+        id: deployment
+        uses: actions/deploy-pages@v4
