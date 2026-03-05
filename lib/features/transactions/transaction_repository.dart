@@ -1,7 +1,6 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-// Mana shu o'zgaruvchi xatolikda "Undefined" bo'lib chiqayotgan edi
 final transactionRepoProvider = Provider((ref) => TransactionRepository(Supabase.instance.client));
 
 class TransactionRepository {
@@ -25,8 +24,12 @@ class TransactionRepository {
     final double amountUsd = currency == 'USD' ? amount : 0;
 
     if (subCategory == 'salary') {
+      // Shaffoflik mantig'i: Kim yozganiga qarab status qo'yish
       String initialStatus = (userRole == 'admin') ? 'pending_employee' : 'pending_admin';
+      
+      // Admin xodimni tanlashi kerak, xodim esa o'ziga yozadi
       final String employeeId = (userRole == 'admin') ? (targetEmployeeId ?? '') : currentUserId;
+      if (employeeId.isEmpty) throw Exception("Xodim tanlanmagan");
 
       await _client.from('salaries').insert({
         'user_id': employeeId,
@@ -38,6 +41,7 @@ class TransactionRepository {
         'created_by': currentUserId,
       });
     } else {
+      // Oddiy tranzaksiya
       await _client.from('transactions').insert({
         'user_id': currentUserId,
         'type': type,
@@ -62,9 +66,9 @@ class TransactionRepository {
     
     var query = _client.from('salaries').select('*, profiles(full_name)');
     if (role == 'admin') {
-      return await query.eq('status', 'pending_admin');
+      return await query.eq('status', targetStatus);
     } else {
-      return await query.eq('status', 'pending_employee').eq('user_id', userId!);
+      return await query.eq('status', targetStatus).eq('user_id', userId!);
     }
   }
 }
