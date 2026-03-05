@@ -8,19 +8,16 @@ class DashboardScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // 1. Profilni olish (Qotmaslik uchun faqat bir marta o'qiymiz)
-    final user = Supabase.instance.client.auth.currentUser;
-    
-    // 2. Ma'lumotlarni yuklash
     final statsAsync = ref.watch(statsProvider);
 
     return Scaffold(
       appBar: AppBar(
         title: const Text("CABIX Moliya"),
+        centerTitle: true,
         actions: [
           IconButton(
             onPressed: () => Supabase.instance.client.auth.signOut(),
-            icon: const Icon(Icons.logout),
+            icon: const Icon(Icons.logout_rounded),
           )
         ],
       ),
@@ -28,42 +25,63 @@ class DashboardScreen extends ConsumerWidget {
         data: (stats) => RefreshIndicator(
           onRefresh: () => ref.refresh(statsProvider.future),
           child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
             padding: const EdgeInsets.all(16),
             child: Column(
               children: [
-                _buildCard("Balans", "${stats['balance']} UZS", Colors.blue),
-                const SizedBox(height: 12),
-                _buildCard("Kirim", "+${stats['income']} UZS", Colors.green),
-                const SizedBox(height: 12),
-                _buildCard("Chiqim", "-${stats['expense']} UZS", Colors.red),
-                
-                const SizedBox(height: 24),
-                const Text("Tizim barqaror ishlamoqda ✅", 
-                  style: TextStyle(color: Colors.grey, fontSize: 12)),
+                _buildFinanceCard("UMUMIY BALANS", "${stats['balance']} UZS", Colors.blue),
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    Expanded(child: _buildFinanceCard("KIRIM", "+${stats['income']}", Colors.green)),
+                    const SizedBox(width: 12),
+                    Expanded(child: _buildFinanceCard("CHIQIM", "-${stats['expense']}", Colors.red)),
+                  ],
+                ),
+                const SizedBox(height: 32),
+                const Icon(Icons.verified_user, color: Colors.green, size: 40),
+                const SizedBox(height: 8),
+                const Text("Ma'lumotlar muvaffaqiyatli yuklandi", 
+                  style: TextStyle(color: Colors.grey)),
               ],
             ),
           ),
         ),
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text("Xato: $e")),
+        error: (e, _) => Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.error_outline, color: Colors.red, size: 60),
+              const SizedBox(height: 16),
+              Text("Xatolik: $e", textAlign: TextAlign.center),
+              ElevatedButton(
+                onPressed: () => ref.refresh(statsProvider),
+                child: const Text("Qayta urinish"),
+              )
+            ],
+          ),
+        ),
       ),
     );
   }
 
-  Widget _buildCard(String title, String amount, Color color) {
+  Widget _buildFinanceCard(String title, String amount, Color color) {
     return Container(
-      width: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: color.withOpacity(0.3)),
+        color: color.withOpacity(0.05),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: color.withOpacity(0.2), width: 2),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title, style: TextStyle(color: color, fontWeight: FontWeight.bold)),
-          Text(amount, style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+          Text(title, style: TextStyle(color: color, fontWeight: FontWeight.bold, fontSize: 12)),
+          const SizedBox(height: 8),
+          FittedBox(
+            child: Text(amount, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+          ),
         ],
       ),
     );
