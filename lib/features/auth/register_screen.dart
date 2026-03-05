@@ -32,7 +32,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
     
     setState(() => _isLoading = true);
     try {
-      // Supabase orqali ro'yxatdan o'tish va ismni metadata sifatida yuborish
       await Supabase.instance.client.auth.signUp(
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
@@ -43,7 +42,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Muvaffaqiyatli ro\'yxatdan o\'tdingiz!')),
         );
-        context.go('/dashboard'); // Yoki login sahifasiga qaytarish mumkin
+        context.go('/dashboard'); 
       }
     } on AuthException catch (e) {
       if (mounted) {
@@ -206,7 +205,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               backgroundColor: fintechAccent,
                               foregroundColor: Colors.white,
                               padding: const EdgeInsets.symmetric(vertical: 16),
-                              shape: RoundedRectangleWithCornerRadii(borderRadius: BorderRadius.circular(16)),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)), // Xato tuzatildi
                               elevation: 2,
                             ),
                             child: _isLoading 
