@@ -8,42 +8,44 @@ class DashboardScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // Rolni faqat UI darajasida ajratamiz (bazaga so'rov yo'q)
+    // 1. Profilni olish (Qotmaslik uchun faqat bir marta o'qiymiz)
     final user = Supabase.instance.client.auth.currentUser;
-    // Diqqat: Profil jadvalidan emas, login qilgan email-dan yoki statik tekshiramiz
-    final bool isAdmin = user?.email == 'admin@cabix.uz'; // O'zingizni admin email-ingizni yozing
-
+    
+    // 2. Ma'lumotlarni yuklash
     final statsAsync = ref.watch(statsProvider);
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(isAdmin ? "Admin Panel" : "Xodim Paneli"),
+        title: const Text("CABIX Moliya"),
         actions: [
           IconButton(
-            onPressed: () async {
-              await Supabase.instance.client.auth.signOut();
-            },
+            onPressed: () => Supabase.instance.client.auth.signOut(),
             icon: const Icon(Icons.logout),
           )
         ],
       ),
       body: statsAsync.when(
-        data: (stats) => SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            children: [
-              _buildCard("Balans", "${stats['balance']} UZS", Colors.blue),
-              const SizedBox(height: 12),
-              _buildCard("Kirim", "+${stats['income']} UZS", Colors.green),
-              const SizedBox(height: 12),
-              _buildCard("Chiqim", "-${stats['expense']} UZS", Colors.red),
-              const SizedBox(height: 24),
-              const Text("Oxirgi amallaringiz bazada saqlanmoqda...", style: TextStyle(color: Colors.grey)),
-            ],
+        data: (stats) => RefreshIndicator(
+          onRefresh: () => ref.refresh(statsProvider.future),
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              children: [
+                _buildCard("Balans", "${stats['balance']} UZS", Colors.blue),
+                const SizedBox(height: 12),
+                _buildCard("Kirim", "+${stats['income']} UZS", Colors.green),
+                const SizedBox(height: 12),
+                _buildCard("Chiqim", "-${stats['expense']} UZS", Colors.red),
+                
+                const SizedBox(height: 24),
+                const Text("Tizim barqaror ishlamoqda ✅", 
+                  style: TextStyle(color: Colors.grey, fontSize: 12)),
+              ],
+            ),
           ),
         ),
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text("Yuklashda xato: $e")),
+        error: (e, _) => Center(child: Text("Xato: $e")),
       ),
     );
   }
@@ -61,7 +63,6 @@ class DashboardScreen extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(title, style: TextStyle(color: color, fontWeight: FontWeight.bold)),
-          const SizedBox(height: 8),
           Text(amount, style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
         ],
       ),
