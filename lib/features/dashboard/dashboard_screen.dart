@@ -2,6 +2,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/theme/theme_provider.dart';
+import '../auth/auth_provider.dart'; // Rolni aniqlash uchun
 import '../transactions/transaction_repository.dart';
 import 'dashboard_provider.dart';
 
@@ -13,7 +14,8 @@ class DashboardScreen extends ConsumerWidget {
     final currentTheme = ref.watch(themeProvider);
     final bool isGlass = currentTheme == AppThemeMode.glass;
     
-    // Ma'lumotlarni provayderlardan olish
+    // Provayderlardan ma'lumotlarni olish
+    final role = ref.watch(userRoleProvider); 
     final statsAsync = ref.watch(statsProvider);
     final pendingAsync = ref.watch(pendingSalariesProvider);
 
@@ -37,16 +39,16 @@ class DashboardScreen extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildHeader(context, ref),
+                _buildHeader(context, ref, role),
                 const SizedBox(height: 24),
                 
-                // 1. Balans Kartochkalari (Real ma'lumotlar bilan)
-                _buildBalanceCards(context, statsAsync),
-                
-                // 2. Tasdiqlash kutilayotgan amallar (Faqat ma'lumot bo'lsa chiqadi)
+                // 1. ROLGA QARAB BALANS KARTALARI
+                _buildResponsiveBalanceSection(context, statsAsync, role),
+
+                // 2. TASDIQLASH KUTILAYOTGANLAR (Pending Section)
                 pendingAsync.when(
                   data: (items) => items.isNotEmpty 
-                    ? _buildPendingSection(context, ref, items) 
+                    ? _buildPendingSection(context, ref, items, role) 
                     : const SizedBox.shrink(),
                   loading: () => const Padding(
                     padding: EdgeInsets.symmetric(vertical: 20),
@@ -56,12 +58,13 @@ class DashboardScreen extends ConsumerWidget {
                 ),
 
                 const SizedBox(height: 24),
-                const Text("Oylik statistika", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                const Text("Statistika dinamikasi", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 16),
                 _buildMainChart(context),
                 
                 const SizedBox(height: 24),
-                const Text("Oxirgi amallar", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                Text(role == 'admin' ? "Oxirgi barcha amallar" : "Mening oxirgi amallarim", 
+                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                 _buildRecentTransactions(),
               ],
             ),
@@ -71,16 +74,19 @@ class DashboardScreen extends ConsumerWidget {
     );
   }
 
-  // Header bo'limi
-  Widget _buildHeader(BuildContext context, WidgetRef ref) {
+  // Header: Salomlashish va Mavzu almashtirgich
+  Widget _buildHeader(BuildContext context, WidgetRef ref, String role) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        const Column(
+        Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("Xush kelibsiz!", style: TextStyle(fontSize: 14, color: Colors.grey)),
-            Text("Boshqaruv paneli", style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+            const Text("Xush kelibsiz!", style: TextStyle(fontSize: 14, color: Colors.grey)),
+            Text(
+              role == 'admin' ? "Admin Panel" : "Xodim Paneli",
+              style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+            ),
           ],
         ),
         _ThemeSwitcher(),
@@ -88,12 +94,13 @@ class DashboardScreen extends ConsumerWidget {
     );
   }
 
-  // Balans kartochkalari vidjeti
-  Widget _buildBalanceCards(BuildContext context, AsyncValue<Map<String, double>> statsAsync) {
+  // Balans qismi: Web va Mobile uchun moslashuvchan
+  Widget _buildResponsiveBalanceSection(BuildContext context, AsyncValue<Map<String, double>> statsAsync, String role) {
     return statsAsync.when(
       data: (stats) {
         final width = MediaQuery.of(context).size.width;
         int crossAxisCount = width > 1200 ? 3 : (width > 600 ? 2 : 1);
+        
         return GridView.count(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
@@ -103,19 +110,19 @@ class DashboardScreen extends ConsumerWidget {
           crossAxisSpacing: 16,
           children: [
             _FinanceCard(
-              title: "Umumiy balans", 
+              title: role == 'admin' ? "Kassa qoldig'i" : "Mening balansim", 
               amount: "${stats['balance']?.toStringAsFixed(0)} UZS", 
               icon: Icons.account_balance_wallet, 
               color: Colors.blue
             ),
             _FinanceCard(
-              title: "Oylik kirim", 
+              title: role == 'admin' ? "Umumiy tushum" : "Jami oylik", 
               amount: "+${stats['income']?.toStringAsFixed(0)} UZS", 
               icon: Icons.trending_up, 
               color: Colors.green
             ),
             _FinanceCard(
-              title: "Oylik chiqim", 
+              title: role == 'admin' ? "Umumiy chiqim" : "Olingan avans", 
               amount: "-${stats['expense']?.toStringAsFixed(0)} UZS", 
               icon: Icons.trending_down, 
               color: Colors.red
@@ -124,22 +131,22 @@ class DashboardScreen extends ConsumerWidget {
         );
       },
       loading: () => const Center(child: CircularProgressIndicator()),
-      error: (e, _) => Center(child: Text("Xatolik: $e")),
+      error: (e, _) => Center(child: Text("Ma'lumot yuklashda xato: $e")),
     );
   }
 
-  // Tasdiqlash kutilayotgan amallar vidjeti
-  Widget _buildPendingSection(BuildContext context, WidgetRef ref, List<Map<String, dynamic>> items) {
+  // Tasdiqlash bo'limi (Shaffoflik tizimi)
+  Widget _buildPendingSection(BuildContext context, WidgetRef ref, List<Map<String, dynamic>> items, String role) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const SizedBox(height: 24),
         Row(
           children: [
-            const Icon(Icons.pending_actions, color: Colors.orange, size: 20),
+            const Icon(Icons.security_update_good, color: Colors.orange, size: 20),
             const SizedBox(width: 8),
             Text(
-              "Tasdiqlash kutilmoqda (${items.length})",
+              role == 'admin' ? "Tasdiqlashingiz kerak" : "Sizga yozilgan pullar",
               style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.orange),
             ),
           ],
@@ -156,16 +163,16 @@ class DashboardScreen extends ConsumerWidget {
               child: ListTile(
                 contentPadding: const EdgeInsets.symmetric(horizontal: 12),
                 title: Text("${item['amount_uzs']} UZS", style: const TextStyle(fontWeight: FontWeight.bold)),
-                subtitle: Text("Kimdan: ${item['profiles']?['full_name'] ?? 'Noma\'lum'}\nIzoh: ${item['comment'] ?? '-'}"),
+                subtitle: Text("Izoh: ${item['comment'] ?? 'Izohsiz'}\nXodim: ${item['profiles']?['full_name'] ?? 'Noma\'lum'}"),
                 trailing: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     IconButton(
-                      icon: const Icon(Icons.check_circle, color: Colors.green),
+                      icon: const Icon(Icons.check_circle_outline, color: Colors.green),
                       onPressed: () => _updateStatus(ref, item['id'], 'confirmed'),
                     ),
                     IconButton(
-                      icon: const Icon(Icons.cancel, color: Colors.red),
+                      icon: const Icon(Icons.highlight_off, color: Colors.red),
                       onPressed: () => _updateStatus(ref, item['id'], 'rejected'),
                     ),
                   ],
@@ -188,7 +195,7 @@ class DashboardScreen extends ConsumerWidget {
     return _GlassContainer(
       height: 250,
       width: double.infinity,
-      child: const Center(child: Text("Grafik (fl_chart) tayyorlanmoqda...")),
+      child: const Center(child: Text("Haftalik grafik (fl_chart)")),
     );
   }
 
@@ -199,17 +206,17 @@ class DashboardScreen extends ConsumerWidget {
       itemCount: 3,
       itemBuilder: (context, index) => ListTile(
         contentPadding: EdgeInsets.zero,
-        leading: const CircleAvatar(child: Icon(Icons.history, size: 20)),
-        title: const Text("Oxirgi amaliyot"),
-        subtitle: const Text("Bugun"),
-        trailing: const Text("Ko'rish", style: TextStyle(color: Colors.blue)),
+        leading: const CircleAvatar(backgroundColor: Colors.black12, child: Icon(Icons.sync_alt, size: 18)),
+        title: const Text("Tranzaksiya tarixi"),
+        subtitle: const Text("Bugun, 10:00"),
+        trailing: const Icon(Icons.chevron_right),
       ),
     );
   }
 }
 
 // ---------------------------------------------------------
-// UI KOMPONENTLARI (Glassmorphism & Cards)
+// GLASSMORPHISM UI KOMPONENTLARI
 // ---------------------------------------------------------
 
 class _GlassContainer extends ConsumerWidget {
@@ -285,8 +292,8 @@ class _FinanceCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(title, style: const TextStyle(color: Colors.grey, fontSize: 12)),
-                Text(amount, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                Text(title, style: const TextStyle(color: Colors.grey, fontSize: 12), maxLines: 1),
+                Text(amount, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16), maxLines: 1),
               ],
             ),
           )
@@ -301,9 +308,9 @@ class _ThemeSwitcher extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return Row(
       children: [
-        IconButton(onPressed: () => ref.read(themeProvider.notifier).setTheme(AppThemeMode.standard), icon: const Icon(Icons.light_mode_outlined, size: 20)),
-        IconButton(onPressed: () => ref.read(themeProvider.notifier).setTheme(AppThemeMode.dark), icon: const Icon(Icons.dark_mode_outlined, size: 20)),
-        IconButton(onPressed: () => ref.read(themeProvider.notifier).setTheme(AppThemeMode.glass), icon: const Icon(Icons.blur_on, size: 20)),
+        IconButton(onPressed: () => ref.read(themeProvider.notifier).setTheme(AppThemeMode.standard), icon: const Icon(Icons.wb_sunny_outlined, size: 20)),
+        IconButton(onPressed: () => ref.read(themeProvider.notifier).setTheme(AppThemeMode.dark), icon: const Icon(Icons.nightlight_round_outlined, size: 20)),
+        IconButton(onPressed: () => ref.read(themeProvider.notifier).setTheme(AppThemeMode.glass), icon: const Icon(Icons.auto_awesome_motion, size: 20)),
       ],
     );
   }
