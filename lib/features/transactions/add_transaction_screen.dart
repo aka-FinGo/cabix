@@ -1,156 +1,96 @@
-import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
-import '../dashboard/dashboard_provider.dart';
-import '../transactions/transaction_repository.dart'; // Bu faylni avval yaratganmiz
 
-class AddTransactionScreen extends ConsumerStatefulWidget {
-  const AddTransactionScreen({super.key});
+// Riverpod Provider
+final transactionRepoProvider = Provider((ref) => TransactionRepository(Supabase.instance.client));
 
-  @override
-  ConsumerState<AddTransactionScreen> createState() => _AddTransactionScreenState();
-}
+class TransactionRepository {
+  final SupabaseClient _client;
+  TransactionRepository(this._client);
 
-class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
-  final _formKey = GlobalKey<FormState>();
-  final _amountController = TextEditingController();
-  final _rateController = TextEditingController(text: '12850'); // Standart kurs
-  final _commentController = TextEditingController();
+  /// Yangi amal qo'shish (Kirim, Chiqim yoki Ish haqi)
+  Future<void> addRecord({
+    required String type,          // 'income' yoki 'expense'
+    required String subCategory,   // 'salary' yoki 'other'
+    required double amount,
+    required String currency,      // 'UZS' yoki 'USD'
+    double exchangeRate = 1.0,
+    required String comment,
+    required String userRole,      // 'admin' yoki 'user'
+    String? targetEmployeeId,      // Admin to'lov qilayotgan xodimning ID si
+  }) async {
+    final currentUserId = _client.auth.currentUser?.id;
+    if (currentUserId == null) throw Exception("Sessiya topilmadi");
 
-  String _mainType = 'income'; // 'income' yoki 'expense'
-  String _subType = 'salary';  // 'salary' yoki 'other'
-  String _currency = 'UZS';
-  bool _isLoading = false;
+    // Valyuta hisob-kitobi (Doim UZS ga o'girib saqlaymiz)
+    final double amountUzs = currency == 'USD' ? amount * exchangeRate : amount;
+    final double amountUsd = currency == 'USD' ? amount : 0;
 
-  Future<void> _handleSave() async {
-    if (!_formKey.currentState!.validate()) return;
-
-    setState(() => _isLoading = true);
-    try {
-      final repo = ref.read(dashboardRepoProvider); // Dashboard repo'dan foydalanamiz yoki yangi ochamiz
+    if (subCategory == 'salary') {
+      // 1. Ish haqi mantig'i (O'zaro tasdiqlash bilan)
       
-      // Valyuta hisobi
-      double amount = double.parse(_amountController.text);
-      double rate = _currency == 'USD' ? double.parse(_rateController.text) : 1.0;
+      // Statusni aniqlash:
+      // Admin yozsa -> xodim tasdiqlashi kerak (pending_employee)
+      // Xodim yozsa -> admin tasdiqlashi kerak (pending_admin)
+      String initialStatus = (userRole == 'admin') 
+          ? 'pending_employee' 
+          : 'pending_admin';
 
-      // Repository orqali bazaga yozish
-      // Eslatma: Bu funksiya avvalgi darsimizda yozilgan mantiq asosida ishlaydi
-      await ref.read(transactionRepoProvider).addRecord(
-        type: _mainType,
-        subCategory: _subType,
-        amount: amount,
-        currency: _currency,
-        exchangeRate: rate,
-        comment: _commentController.text,
-      );
+      // Agar xodim o'zi uchun yozayotgan bo'lsa, targetEmployeeId uning o'z ID si bo'ladi
+      final String employeeId = (userRole == 'admin') 
+          ? (targetEmployeeId ?? '') 
+          : currentUserId;
 
-      // Ma'lumotlarni yangilash
-      ref.invalidate(statsProvider);
+      if (employeeId.isEmpty) throw Exception("Xodim tanlanishi shart");
 
-      if (mounted) {
-        context.pop();
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Amaliyot saqlandi!')));
-      }
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Xatolik: $e')));
-    } finally {
-      if (mounted) setState(() => _isLoading = false);
+      await _client.from('salaries').insert({
+        'user_id': employeeId,
+        'amount_uzs': amountUzs,
+        'amount_usd': amountUsd,
+        'exchange_rate': exchangeRate,
+        'comment': comment,
+        'status': initialStatus,
+        'created_by': currentUserId,
+      });
+    } else {
+      // 2. Oddiy tranzaksiyalar (Kirim/Chiqim) - Darhol tasdiqlanadi
+      await _client.from('transactions').insert({
+        'user_id': currentUserId,
+        'type': type,
+        'amount_uzs': amountUzs,
+        'amount_usd': amountUsd,
+        'exchange_rate': exchangeRate,
+        'comment': comment,
+      });
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Yangi amaliyot')),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            children: [
-              // 1. Asosiy tur (Kirim/Chiqim)
-              SegmentedButton<String>(
-                segments: const [
-                  ButtonSegment(value: 'income', label: Text('Kirim'), icon: Icon(Icons.add_circle_outline)),
-                  ButtonSegment(value: 'expense', label: Text('Chiqim'), icon: Icon(Icons.remove_circle_outline)),
-                ],
-                selected: {_mainType},
-                onSelectionChanged: (val) => setState(() => _mainType = val.first),
-              ),
-              const SizedBox(height: 20),
+  /// Ish haqini tasdiqlash yoki rad etish
+  Future<void> updateSalaryStatus({
+    required String salaryId,
+    required String newStatus, // 'confirmed' yoki 'rejected'
+  }) async {
+    await _client.from('salaries').update({
+      'status': newStatus,
+      'confirmed_at': newStatus == 'confirmed' ? DateTime.now().toIso8601String() : null,
+    }).eq('id', salaryId);
+  }
 
-              // 2. Ichki tur (Faqat kirim bo'lsa chiqadi)
-              if (_mainType == 'income')
-                DropdownButtonFormField<String>(
-                  value: _subType,
-                  decoration: const InputDecoration(labelText: 'Kirim turi', border: OutlineInputBorder()),
-                  items: const [
-                    DropdownMenuItem(value: 'salary', child: Text('Ish haqi')),
-                    DropdownMenuItem(value: 'other', child: Text('Boshqa daromad')),
-                  ],
-                  onChanged: (val) => setState(() => _subType = val!),
-                ),
-              const SizedBox(height: 16),
+  /// Tasdiqlash kutilayotgan ish haqlarini olish
+  /// Admin uchun: pending_admin bo'lganlar
+  /// Xodim uchun: pending_employee bo'lganlar
+  Future<List<Map<String, dynamic>>> getPendingApprovals(String role) async {
+    final userId = _client.auth.currentUser?.id;
+    final String targetStatus = (role == 'admin') ? 'pending_admin' : 'pending_employee';
 
-              // 3. Valyuta tanlash
-              Row(
-                children: [
-                  Expanded(
-                    flex: 2,
-                    child: TextFormField(
-                      controller: _amountController,
-                      keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(labelText: 'Summa', border: OutlineInputBorder()),
-                      validator: (v) => v!.isEmpty ? 'Summani yozing' : null,
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: DropdownButtonFormField<String>(
-                      value: _currency,
-                      decoration: const InputDecoration(border: OutlineInputBorder()),
-                      items: const [
-                        DropdownMenuItem(value: 'UZS', child: Text('UZS')),
-                        DropdownMenuItem(value: 'USD', child: Text('USD')),
-                      ],
-                      onChanged: (val) => setState(() => _currency = val!),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
+    var query = _client.from('salaries').select('*, profiles(full_name)');
 
-              // 4. Kurs (Faqat USD bo'lsa)
-              if (_currency == 'USD')
-                TextFormField(
-                  controller: _rateController,
-                  keyboardType: TextInputType.number,
-                  decoration: const InputDecoration(labelText: 'Kurs (1 USD = ? UZS)', border: OutlineInputBorder()),
-                ),
-              const SizedBox(height: 16),
-
-              // 5. Izoh
-              TextFormField(
-                controller: _commentController,
-                decoration: const InputDecoration(labelText: 'Izoh', border: OutlineInputBorder()),
-                maxLines: 2,
-              ),
-              const SizedBox(height: 30),
-
-              // 6. Saqlash tugmasi
-              SizedBox(
-                width: double.infinity,
-                height: 55,
-                child: ElevatedButton(
-                  onPressed: _isLoading ? null : _handleSave,
-                  style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF0F6659), foregroundColor: Colors.white),
-                  child: _isLoading ? const CircularProgressIndicator(color: Colors.white) : const Text('SAQLASH'),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
+    if (role == 'admin') {
+      // Admin barcha kutayotganlarni ko'radi
+      return await query.eq('status', 'pending_admin');
+    } else {
+      // Xodim faqat o'ziga tegishli kutayotganlarni ko'radi
+      return await query.eq('status', 'pending_employee').eq('user_id', userId!);
+    }
   }
 }
