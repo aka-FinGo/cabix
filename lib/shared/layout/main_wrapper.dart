@@ -88,11 +88,12 @@ class _MainWrapperState extends State<MainWrapper> {
       ),
       
       // Mobilda yangi amal qo'shish tugmasi
-      floatingActionButton: isWeb ? null : FloatingActionButton(
-        onPressed: () {},
-        backgroundColor: const Color(0xFF2EAF9B),
-        child: const Icon(Icons.add, color: Colors.white),
-      ),
+      // FloatingActionButton qismini shunday o'zgartiring:
+floatingActionButton: isWeb ? null : FloatingActionButton(
+  onPressed: () => context.push('/add-transaction'), 
+  backgroundColor: const Color(0xFF2EAF9B),
+  child: const Icon(Icons.add, color: Colors.white),
+),
     );
   }
 
