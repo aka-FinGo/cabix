@@ -10,14 +10,18 @@ final statsProvider = FutureProvider.autoDispose<Map<String, double>>((ref) asyn
   
   if (user == null) return {'balance': 0.0, 'income': 0.0, 'expense': 0.0};
 
-  // Tranzaksiyalarni o'qiymiz
-  final response = await supabase.from('transactions').select('type, amount');
-  
   double income = 0;
   double expense = 0;
 
-  for (var tx in response) {
-    final amount = (tx['amount'] as num).toDouble();
+  // 1. SHAXSIY TRANZAKSIYALAR (Faqat o'ziga tegishli pullar)
+  // .eq('user_id', user.id) orqali Admin ham, xodim ham FAQT o'zini hisoblaydi
+  final txResponse = await supabase
+      .from('transactions')
+      .select('type, amount')
+      .eq('user_id', user.id); 
+
+  for (var tx in txResponse) {
+    final amount = (tx['amount'] as num?)?.toDouble() ?? 0.0;
     if (tx['type'] == 'income' || tx['type'] == 'kirim') {
       income += amount;
     } else if (tx['type'] == 'expense' || tx['type'] == 'chiqim') {
@@ -25,16 +29,34 @@ final statsProvider = FutureProvider.autoDispose<Map<String, double>>((ref) asyn
     }
   }
 
-  // Tasdiqlangan oylik/avanslarni (salaries) ham kirimga qo'shamiz
-  final salariesResponse = await supabase
+  // 2. OYLIK VA AVANSLAR (Faqat tasdiqlanganlar)
+  
+  // A) Menga kelgan pullar (Kirim bo'ladi)
+  final salariesReceived = await supabase
       .from('salaries')
       .select('amount_uzs')
-      .eq('status', 'confirmed'); // Faqat tasdiqlanganlari balansga ta'sir qiladi
+      .eq('status', 'confirmed')
+      .eq('user_id', user.id); // Pulni oluvchi MEN bo'lsam
 
-  for (var salary in salariesResponse) {
-    income += (salary['amount_uzs'] as num).toDouble();
+  for (var salary in salariesReceived) {
+    income += (salary['amount_uzs'] as num?)?.toDouble() ?? 0.0;
   }
 
+  // B) Men birovga bergan pullarim (Chiqim bo'ladi)
+  final salariesGiven = await supabase
+      .from('salaries')
+      .select('amount_uzs, user_id')
+      .eq('status', 'confirmed')
+      .eq('created_by', user.id); // Pulni yuborgan MEN bo'lsam
+
+  for (var salary in salariesGiven) {
+    // Agar o'zimga o'zim yozmagan bo'lsam (ya'ni boshqa xodimga bergan bo'lsam) bu menga CHIQIM!
+    if (salary['user_id'] != user.id) {
+      expense += (salary['amount_uzs'] as num?)?.toDouble() ?? 0.0;
+    }
+  }
+
+  // Yakuniy balans
   final balance = income - expense;
 
   return {
