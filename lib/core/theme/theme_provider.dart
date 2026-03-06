@@ -12,6 +12,16 @@ class ThemeNotifier extends StateNotifier<AppThemeMode> {
 
   void setTheme(AppThemeMode mode) => state = mode;
 
+  void toggleTheme() {
+    if (state == AppThemeMode.standard) {
+      state = AppThemeMode.dark;
+    } else if (state == AppThemeMode.dark) {
+      state = AppThemeMode.glass;
+    } else {
+      state = AppThemeMode.standard;
+    }
+  }
+
   // Mavzuga qarab ranglar va effektlar palitrasini olish
   ThemeData getThemeData() {
     switch (state) {
