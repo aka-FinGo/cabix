@@ -10,7 +10,7 @@ import 'features/auth/register_screen.dart';
 import 'features/dashboard/dashboard_screen.dart';
 import 'shared/layout/main_wrapper.dart';
 import 'features/transactions/add_transaction_screen.dart';
-
+import 'package:cabix/features/notifications/notifications_screen.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
