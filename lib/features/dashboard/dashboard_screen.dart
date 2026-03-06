@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:fl_chart/fl_chart.dart'; // fl_chart kutubxonasi
 import '../../core/theme/theme_provider.dart';
-import '../transactions/transaction_repository.dart';
+//import '../transactions/transaction_repository.dart';
 import 'dashboard_provider.dart';
 
 class DashboardScreen extends ConsumerWidget {
