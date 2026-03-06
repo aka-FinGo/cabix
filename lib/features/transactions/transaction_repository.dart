@@ -24,8 +24,9 @@ class TransactionRepository {
     final double amountUsd = currency == 'USD' ? amount : 0;
 
     if (subCategory == 'salary') {
-      // Shaffoflik mantig'i: Kim yozganiga qarab status qo'yish
-      String initialStatus = (userRole == 'admin') ? 'pending_employee' : 'pending_admin';
+      // Shaffoflik mantig'i: SQL bazasida status faqat 'pending', 'confirmed', 'rejected' bo'lishi mumkin.
+      // Biz kim tomonidan yozilganini (created_by) orqali kutilayotgan tasdiqni aniqlaymiz.
+      String initialStatus = 'pending';
       
       // Admin xodimni tanlashi kerak, xodim esa o'ziga yozadi
       final String employeeId = (userRole == 'admin') ? (targetEmployeeId ?? '') : currentUserId;
@@ -62,13 +63,22 @@ class TransactionRepository {
 
   Future<List<Map<String, dynamic>>> getPendingApprovals(String role) async {
     final userId = _client.auth.currentUser?.id;
-    final String targetStatus = (role == 'admin') ? 'pending_admin' : 'pending_employee';
+    if (userId == null) return [];
     
-    var query = _client.from('salaries').select('*, profiles(full_name)');
+    // Asosiy so'rov: holati 'pending' bo'lgan ish haqlari va ularning ma'lumotlari
+    var query = _client.from('salaries').select('*, profiles(full_name)').eq('status', 'pending');
+    
+    // Agar admin bo'lsa: user o'zi kiritgan (yoki boshqa admin kiritmagan) kutilayotgan so'rovlarni ko'radi
+    // SQL da created_by = user_id bo'lsa, xodim o'zi kiritgan bo'ladi.
     if (role == 'admin') {
-      return await query.eq('status', targetStatus);
+      // Supabase'da rpc() yoki filter orqali ikkita ustunni solishtirish imkoni yo'q,
+      // shuning uchun hozircha barcha 'pending'larni olamiz va Dart tomonda filtlaymiz, 
+      // yoxud keyinroq View/Function yozamiz. Ammo admin o'zi yozganini tasdiqlamasligi kerak.
+      // Sodda yechim: Admin o'zi yozmagan barcha 'pending'larni ko'radi
+      return await query.neq('created_by', userId);
     } else {
-      return await query.eq('status', targetStatus).eq('user_id', userId!);
+      // Agar xodim bo'lsa: o'ziga tegishli, lekin o'zi yozmagan (admin yozgan) 'pending'larni ko'radi
+      return await query.eq('user_id', userId).neq('created_by', userId);
     }
   }
 }
