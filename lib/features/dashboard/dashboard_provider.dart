@@ -124,3 +124,39 @@ class TransactionRepository {
         .eq('id', salaryId);
   }
 }
+// Yillik oylik hisobot uchun provayder
+final annualReportProvider = FutureProvider.autoDispose<List<Map<String, dynamic>>>((ref) async {
+  final supabase = Supabase.instance.client;
+  final user = supabase.auth.currentUser;
+  if (user == null) return [];
+
+  final now = DateTime.now();
+  // Joriy yilning boshidan oxirigacha bo'lgan tranzaksiyalarni olamiz
+  final response = await supabase
+      .from('transactions')
+      .select('type, amount, created_at')
+      .eq('user_id', user.id)
+      .gte('created_at', '${now.year}-01-01')
+      .lte('created_at', '${now.year}-12-31');
+
+  // Oylar bo'yicha guruhlash (0-11)
+  List<Map<String, dynamic>> monthlyData = List.generate(12, (index) => {
+    'month': index,
+    'income': 0.0,
+    'expense': 0.0,
+  });
+
+  for (var tx in response) {
+    final date = DateTime.parse(tx['created_at']);
+    final month = date.month - 1;
+    final amount = (tx['amount'] as num).toDouble();
+    
+    if (tx['type'] == 'income') {
+      monthlyData[month]['income'] += amount;
+    } else {
+      monthlyData[month]['expense'] += amount;
+    }
+  }
+  
+  return monthlyData;
+});
