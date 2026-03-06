@@ -1,0 +1,44 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+
+// Oyliklar ro'yxatini yuklash uchun tayyorlangan provayder
+// Agar admin bo'lsa barchasini, xodim bo'lsa faqat o'zinikini ko'radi.
+final salariesProvider = FutureProvider.autoDispose<List<Map<String, dynamic>>>((ref) async {
+  final supabase = Supabase.instance.client;
+  final user = supabase.auth.currentUser;
+  
+  if (user == null) return [];
+
+  final isAdmin = user.appMetadata['is_admin'] == true;
+
+  var query = supabase.from('salaries').select('*, profiles!salaries_user_id_fkey(full_name), creator:profiles!salaries_created_by_fkey(full_name)').order('created_at', ascending: false);
+
+  if (!isAdmin) {
+    query = query.eq('user_id', user.id);
+  }
+
+  final response = await query;
+  return List<Map<String, dynamic>>.from(response);
+});
+
+// Tasdiqlanishi kutilayotgan oyliklarni sanash uchun (badge)
+final pendingSalariesCountProvider = FutureProvider.autoDispose<int>((ref) async {
+  final supabase = Supabase.instance.client;
+  final user = supabase.auth.currentUser;
+  
+  if (user == null) return 0;
+  
+  final isAdmin = user.appMetadata['is_admin'] == true;
+  var query = supabase.from('salaries').select('id', const FetchOptions(count: CountOption.exact)).eq('status', 'pending');
+  
+  if (isAdmin) {
+    // Admin o'zi yozganini tasdiqlamaydi
+    query = query.neq('created_by', user.id);
+  } else {
+    // xodim faqat o'ziga tegishli va o'zi yozmagan (admin yozgan)larni tasdiqlaydi
+    query = query.eq('user_id', user.id).neq('created_by', user.id);
+  }
+  
+  final res = await query;
+  return res.length; 
+});
