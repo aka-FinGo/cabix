@@ -25,14 +25,14 @@ class MainWrapper extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(p['full_name'] ?? 'Foydalanuvchi', style: const TextStyle(color: Colors.black, fontSize: 14, fontWeight: FontWeight.bold)),
-              Text(Supabase.instance.client.auth.currentUser?.appMetadata['is_admin'] == true ? "Admin" : "Xodim", style: const TextStyle(color: Colors.teal, fontSize: 10)),
+              Text(Supabase.instance.client.auth.currentUser?.appMetadata['is_admin'] == true ? "Administrator" : "Xodim", style: const TextStyle(color: Colors.teal, fontSize: 10)),
             ],
           ),
           loading: () => const Text("Yuklanmoqda..."),
           error: (_, __) => const Text("CABIX"),
         ),
         actions: [
-          _NotificationBell(ref),
+          _buildNotificationBell(ref, context), // TO'G'RI CHAQUV
           IconButton(
             icon: Icon(theme == AppThemeMode.glass ? Icons.dark_mode : Icons.light_mode),
             onPressed: () => ref.read(themeProvider.notifier).setTheme(theme == AppThemeMode.glass ? AppThemeMode.standard : AppThemeMode.glass),
@@ -78,19 +78,17 @@ class MainWrapper extends ConsumerWidget {
     );
   }
 
-  Widget _buildNotificationBell(WidgetRef ref) {
+  Widget _buildNotificationBell(WidgetRef ref, BuildContext context) {
     final pending = ref.watch(pendingSalariesProvider);
-    return Consumer(builder: (context, ref, _) {
-      return IconButton(
-        icon: Stack(children: [
-          const Icon(Icons.notifications_none, color: Colors.black),
-          pending.maybeWhen(
-            data: (items) => items.isNotEmpty ? Positioned(right: 0, child: Container(padding: const EdgeInsets.all(2), decoration: const BoxDecoration(color: Colors.red, shape: BoxShape.circle), child: Text('${items.length}', style: const TextStyle(fontSize: 8, color: Colors.white)))) : const SizedBox(),
-            orElse: () => const SizedBox(),
-          ),
-        ]),
-        onPressed: () => context.push('/notifications'),
-      );
-    });
+    return IconButton(
+      icon: Stack(children: [
+        const Icon(Icons.notifications_none, color: Colors.black),
+        pending.maybeWhen(
+          data: (items) => items.isNotEmpty ? Positioned(right: 0, child: Container(padding: const EdgeInsets.all(2), decoration: const BoxDecoration(color: Colors.red, shape: BoxShape.circle), child: Text('${items.length}', style: const TextStyle(fontSize: 8, color: Colors.white)))) : const SizedBox(),
+          orElse: () => const SizedBox(),
+        ),
+      ]),
+      onPressed: () => context.push('/notifications'),
+    );
   }
 }
