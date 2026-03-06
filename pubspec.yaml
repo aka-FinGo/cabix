@@ -16,7 +16,6 @@ dependencies:
   go_router: ^12.1.1
   pdf: ^3.10.4
   excel: ^3.0.0
-  share_plus: ^7.2.1
   google_fonts: ^6.1.0
 
 dev_dependencies:
