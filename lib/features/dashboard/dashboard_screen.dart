@@ -80,12 +80,17 @@ class DashboardScreen extends ConsumerWidget {
 
                         // --- TASDIQLASH KUTILAYOTGANLAR ---
                         pendingAsync.when(
-                          data: (items) => items.isNotEmpty 
-                            ? _buildPendingSection(context, ref, items, isAdmin) 
-                            : const SizedBox.shrink(),
-                          loading: () => const LinearProgressIndicator(),
-                          error: (e, _) => const SizedBox.shrink(),
-                        ),
+  data: (items) => items.isNotEmpty 
+    ? _buildPendingSection(context, ref, items, isAdmin) 
+    : const SizedBox.shrink(),
+  loading: () => const LinearProgressIndicator(),
+  
+  // O'ZGARISH SHU YERDA: Xatoni yashirmasdan ekranga chiqaramiz
+  error: (e, _) => Padding(
+    padding: const EdgeInsets.all(16.0),
+    child: Text("Tugma chiqishda xatolik: $e", style: const TextStyle(color: Colors.red)),
+  ),
+),
 
                         const SizedBox(height: 24),
 
