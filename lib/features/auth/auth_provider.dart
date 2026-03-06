@@ -1,9 +1,17 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-// Foydalanuvchi roli uchun provider
-final userRoleProvider = StateProvider<String>((ref) {
+// Tizimdagi holatni (sessiyani) kuzatuvchi asosiy provider
+final authStateProvider = StreamProvider<AuthState>((ref) {
+  return Supabase.instance.client.auth.onAuthStateChange;
+});
+
+// Foydalanuvchi rolini Token'dan (app_metadata) o'qib beruvchi provider
+final userRoleProvider = Provider<String>((ref) {
   final user = Supabase.instance.client.auth.currentUser;
-  // Metadata ichidan rolni olamiz (SQL-da metadata-ga yozishni sozladik)
-  return user?.userMetadata?['role'] ?? 'user';
+  
+  if (user == null) return 'guest';
+  
+  final isAdmin = user.appMetadata['is_admin'] == true;
+  return isAdmin ? 'admin' : 'worker';
 });
