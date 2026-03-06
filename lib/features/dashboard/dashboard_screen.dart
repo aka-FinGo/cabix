@@ -22,6 +22,8 @@ class DashboardScreen extends ConsumerWidget {
     // 2. Ma'lumotlarni yuklash
     final statsAsync = ref.watch(statsProvider);
     final pendingAsync = ref.watch(pendingSalariesProvider);
+    // YENGI QO'SHILDI: Tranzaksiyalar provayderini kuzatish
+    final recentTransactionsAsync = ref.watch(recentTransactionsProvider);
 
     return Scaffold(
       body: Container(
@@ -37,6 +39,7 @@ class DashboardScreen extends ConsumerWidget {
             onRefresh: () async {
               ref.invalidate(statsProvider);
               ref.invalidate(pendingSalariesProvider);
+              ref.invalidate(recentTransactionsProvider); // Buni ham yangilaymiz
             },
             child: CustomScrollView(
               physics: const AlwaysScrollableScrollPhysics(),
@@ -97,7 +100,10 @@ class DashboardScreen extends ConsumerWidget {
                         Text(isAdmin ? "Barcha oxirgi amallar" : "Mening amallarim", 
                             style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                         const SizedBox(height: 12),
-                        _buildRecentTransactionsPlaceholder(),
+                        
+                        // YENGI QO'SHILDI: Haqiqiy ma'lumotlarni chizish
+                        _buildRecentTransactions(context, recentTransactionsAsync),
+                        
                         const SizedBox(height: 80), // Fab tugma yopib qo'ymasligi uchun joy
                       ],
                     ),
@@ -115,7 +121,7 @@ class DashboardScreen extends ConsumerWidget {
   Widget _buildBalanceCards(BuildContext context, Map<String, double> stats, bool isAdmin) {
     final width = MediaQuery.of(context).size.width;
     int crossAxisCount = width > 800 ? 3 : (width > 500 ? 2 : 1);
-
+    
     return GridView.count(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
@@ -233,21 +239,72 @@ class DashboardScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildRecentTransactionsPlaceholder() {
-    return ListView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      itemCount: 3,
-      itemBuilder: (context, index) => Card(
-        elevation: 0,
-        color: Theme.of(context).cardColor.withOpacity(0.5),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        child: ListTile(
-          leading: const CircleAvatar(backgroundColor: Color(0xFF0F6659), child: Icon(Icons.sync_alt, color: Colors.white, size: 16)),
-          title: const Text("Tranzaksiya"),
-          subtitle: const Text("Bugun"),
-          trailing: const Text("Muvaffaqiyatli", style: TextStyle(color: Colors.green, fontSize: 12)),
-        ),
+  // --- HAQIQIY TRANZAKSIYALAR RO'YXATI WIDGETI (YANGILANDI) ---
+  Widget _buildRecentTransactions(BuildContext context, AsyncValue<List<Map<String, dynamic>>> transactionsAsync) {
+    return transactionsAsync.when(
+      data: (transactions) {
+        if (transactions.isEmpty) {
+          return Container(
+            padding: const EdgeInsets.all(32),
+            alignment: Alignment.center,
+            child: Column(
+              children: [
+                Icon(Icons.receipt_long_outlined, size: 48, color: Colors.grey.shade400),
+                const SizedBox(height: 16),
+                Text("Hozircha hech qanday amal bajarilmagan", style: TextStyle(color: Colors.grey.shade600)),
+              ],
+            ),
+          );
+        }
+
+        return ListView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: transactions.length,
+          itemBuilder: (context, index) {
+            final tx = transactions[index];
+            // Baza tuzilishiga qarab 'income' yoki 'expense' ekanligini aniqlaymiz
+            final isIncome = tx['type'] == 'income' || tx['type'] == 'kirim'; 
+            final amount = tx['amount']?.toString() ?? '0';
+            final date = tx['created_at'].toString().split('T')[0]; // Sanani ajratib olish
+            final category = tx['category'] ?? 'Boshqa';
+            
+            return Card(
+              elevation: 0,
+              color: Theme.of(context).cardColor.withOpacity(0.5),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              margin: const EdgeInsets.only(bottom: 8),
+              child: ListTile(
+                leading: CircleAvatar(
+                  backgroundColor: isIncome ? Colors.green.withOpacity(0.1) : Colors.red.withOpacity(0.1),
+                  child: Icon(
+                    isIncome ? Icons.south_west_rounded : Icons.north_east_rounded, 
+                    color: isIncome ? Colors.green : Colors.red, 
+                    size: 20
+                  )
+                ),
+                title: Text(category, style: const TextStyle(fontWeight: FontWeight.bold)),
+                subtitle: Text("$date • ${tx['description'] ?? ''}", style: const TextStyle(fontSize: 12), maxLines: 1, overflow: TextOverflow.ellipsis),
+                trailing: Text(
+                  "${isIncome ? '+' : '-'}$amount UZS", 
+                  style: TextStyle(
+                    color: isIncome ? Colors.green : Colors.red, 
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                  )
+                ),
+              ),
+            );
+          },
+        );
+      },
+      loading: () => const Padding(
+        padding: EdgeInsets.all(20.0),
+        child: Center(child: CircularProgressIndicator()),
+      ),
+      error: (e, _) => Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: Center(child: Text("Xatolik yuz berdi", style: const TextStyle(color: Colors.red))),
       ),
     );
   }
