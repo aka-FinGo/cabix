@@ -347,7 +347,7 @@ class DashboardScreen extends ConsumerWidget {
                ),
                title: Text(tx['category'] ?? 'Boshqa', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
                subtitle: Text((tx['created_at'].toString().split('T')[0]), style: const TextStyle(color: Colors.grey, fontSize: 12)),
-               trailing: Text("${isIncome ? '+' : '-'}${DashboardWidgets.formatter.format(tx['amount'])} UZS", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: isIncome ? Colors.green : Colors.black87)),
+               trailing: Text("${isIncome ? '+' : '-'}${DashboardWidgets.formatCurrency(tx['amount'])} UZS", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: isIncome ? Colors.green : Colors.black87)),
              );
           },
         );
