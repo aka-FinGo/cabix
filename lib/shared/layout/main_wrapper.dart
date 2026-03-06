@@ -51,6 +51,7 @@ class _MainWrapperState extends ConsumerState<MainWrapper> {
               extended: width > 1200,
               selectedIndex: widget.navigationShell.currentIndex,
               onDestinationSelected: (i) => widget.navigationShell.goBranch(i),
+              // WEB UCHUN YON PANELDA TUGMA
               leading: Padding(
                 padding: const EdgeInsets.symmetric(vertical: 20),
                 child: FloatingActionButton.extended(
