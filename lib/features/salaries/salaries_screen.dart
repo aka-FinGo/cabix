@@ -13,6 +13,7 @@ class SalariesScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final themeMode = ref.watch(themeProvider);
     final isDark = themeMode == AppThemeMode.dark;
+    final isGlass = themeMode == AppThemeMode.glass;
     
     final salariesAsync = ref.watch(salariesProvider);
     
@@ -21,7 +22,7 @@ class SalariesScreen extends ConsumerWidget {
     final isAdmin = user?.appMetadata['is_admin'] == true;
 
     return Scaffold(
-      backgroundColor: isDark ? const Color(0xFF1E1E2C) : const Color(0xFFF5F7FA),
+      backgroundColor: isGlass ? Colors.transparent : (isDark ? const Color(0xFF1E1E2C) : const Color(0xFFF5F7FA)),
       appBar: AppBar(
         title: const Text('Ish Hakki Boshqaruvi', style: TextStyle(fontWeight: FontWeight.bold)),
         backgroundColor: Colors.transparent,
