@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_slidable/flutter_slidable.dart'; // Surish uchun kutubxona
 import '../dashboard/dashboard_provider.dart';
+import '../transactions/transaction_repository.dart'; // transactionRepoProvider uchun joy
 
 class NotificationsScreen extends ConsumerWidget {
   const NotificationsScreen({super.key});
