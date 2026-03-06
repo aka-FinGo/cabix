@@ -13,8 +13,10 @@ class DashboardScreen extends ConsumerWidget {
     final width = MediaQuery.of(context).size.width;
     final bool isWeb = width > 800; // O'tish nuqtasi
 
+    final theme = ref.watch(themeProvider);
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF1F5F9), // FinTrack Light Gray Background
+      backgroundColor: theme == AppThemeMode.glass ? Colors.transparent : (theme == AppThemeMode.dark ? const Color(0xFF1E1E2C) : const Color(0xFFF1F5F9)),
       body: RefreshIndicator(
         onRefresh: () async { 
           ref.invalidate(statsProvider); 
