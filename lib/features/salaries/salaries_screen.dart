@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:intl/intl.dart';
 import 'salary_provider.dart';
 import '../transactions/transaction_repository.dart';
 import '../../core/theme/theme_provider.dart';
+import '../dashboard/dashboard_widgets.dart';
 
 class SalariesScreen extends ConsumerWidget {
   const SalariesScreen({super.key});
@@ -84,7 +84,6 @@ class SalariesScreen extends ConsumerWidget {
         if (!isAdmin && userId == currentUserId && createdBy != currentUserId) canConfirm = true;
     }
     
-    final formatter = NumberFormat('#,###', 'uz_UZ');
     final uzs = double.tryParse(salary['amount_uzs'].toString()) ?? 0.0;
     
     IconData statusIcon = Icons.hourglass_empty;
@@ -138,7 +137,7 @@ class SalariesScreen extends ConsumerWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              "${formatter.format(uzs)} UZS",
+              "${DashboardWidgets.formatCurrency(uzs)} UZS",
               style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xFF0F6659)),
             ),
             if (salary['comment'] != null && salary['comment'].isNotEmpty)
