@@ -21,24 +21,19 @@ class _MainWrapperState extends ConsumerState<MainWrapper> {
     final theme = ref.watch(themeProvider);
 
     return Scaffold(
-      // 1. OQ APPBAR (Har doim tepada qotib turadi)
       appBar: AppBar(
         backgroundColor: Colors.white,
         foregroundColor: Colors.black,
         elevation: 0.5,
-        centerTitle: false,
-        title: const Text('CABIX', style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1.2)),
+        title: const Text('CABIX', style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1.5)),
         actions: [
-          // A) QO'NG'IROQCHA (Notifikatsiyalar)
           _buildNotificationBell(),
-          // B) MAVZU O'ZGARTIRISH
           IconButton(
             icon: Icon(theme == AppThemeMode.glass ? Icons.dark_mode : Icons.auto_awesome),
             onPressed: () => ref.read(themeProvider.notifier).setTheme(
               theme == AppThemeMode.glass ? AppThemeMode.standard : AppThemeMode.glass
             ),
           ),
-          // C) PROFILDAN CHIQISH
           IconButton(
             icon: const Icon(Icons.logout_rounded),
             onPressed: () async {
@@ -56,7 +51,6 @@ class _MainWrapperState extends ConsumerState<MainWrapper> {
               extended: width > 1200,
               selectedIndex: widget.navigationShell.currentIndex,
               onDestinationSelected: (i) => widget.navigationShell.goBranch(i),
-              // WEB UCHUN YON PANELDA "YANGI AMAL" TUGMASI
               leading: Padding(
                 padding: const EdgeInsets.symmetric(vertical: 20),
                 child: FloatingActionButton.extended(
