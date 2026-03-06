@@ -1,14 +1,52 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import '../transactions/transaction_repository.dart';
-import 'dashboard_repository.dart';
 
-final dashboardRepoProvider = Provider((ref) => DashboardRepository());
+// --------------------------------------------------------
+// 1. STATISTIKA PROVAYDERI (Balans, Kirim, Chiqim)
+// --------------------------------------------------------
+final statsProvider = FutureProvider.autoDispose<Map<String, double>>((ref) async {
+  final supabase = Supabase.instance.client;
+  final user = supabase.auth.currentUser;
+  
+  if (user == null) return {'balance': 0.0, 'income': 0.0, 'expense': 0.0};
 
-final statsProvider = FutureProvider<Map<String, double>>((ref) async {
-  return ref.read(dashboardRepoProvider).getMonthlyStats();
+  // Tranzaksiyalarni o'qiymiz
+  final response = await supabase.from('transactions').select('type, amount');
+  
+  double income = 0;
+  double expense = 0;
+
+  for (var tx in response) {
+    final amount = (tx['amount'] as num).toDouble();
+    if (tx['type'] == 'income' || tx['type'] == 'kirim') {
+      income += amount;
+    } else if (tx['type'] == 'expense' || tx['type'] == 'chiqim') {
+      expense += amount;
+    }
+  }
+
+  // Tasdiqlangan oylik/avanslarni (salaries) ham kirimga qo'shamiz
+  final salariesResponse = await supabase
+      .from('salaries')
+      .select('amount_uzs')
+      .eq('status', 'confirmed'); // Faqat tasdiqlanganlari balansga ta'sir qiladi
+
+  for (var salary in salariesResponse) {
+    income += (salary['amount_uzs'] as num).toDouble();
+  }
+
+  final balance = income - expense;
+
+  return {
+    'balance': balance,
+    'income': income,
+    'expense': expense,
+  };
 });
 
+// --------------------------------------------------------
+// 2. TASDIQLASH KUTILAYOTGANLAR (Pending Salaries)
+// --------------------------------------------------------
 final pendingSalariesProvider = FutureProvider.autoDispose<List<Map<String, dynamic>>>((ref) async {
   final user = Supabase.instance.client.auth.currentUser;
   if (user == null) return [];
@@ -21,30 +59,46 @@ final pendingSalariesProvider = FutureProvider.autoDispose<List<Map<String, dyna
       .select()
       .eq('status', 'pending');
 
-  // Shaffoflik mantig'i:
+  // MANTIQ:
+  // Admin -> Xodimlar yozgan so'rovlarni ko'radi (o'zi yozganini emas)
+  // Xodim -> Admin unga yozgan pullarni ko'radi (o'zi yozganini emas)
   if (isAdmin) {
-    // Admin faqat boshqalar (xodimlar) yuborgan so'rovlarni tasdiqlaydi
     query = query.neq('created_by', user.id);
   } else {
-    // Xodim faqat admin unga yozgan pullarni tasdiqlaydi
     query = query.eq('user_id', user.id).neq('created_by', user.id);
   }
 
   final response = await query;
   return List<Map<String, dynamic>>.from(response);
 });
-// ... oldingi kodlar (statsProvider, pendingSalariesProvider va hokazo)
 
-// QO'SHILDI: Oxirgi tranzaksiyalarni olib keluvchi provayder
+// --------------------------------------------------------
+// 3. OXIRGI TRANZAKSIYALAR (Recent Transactions)
+// --------------------------------------------------------
 final recentTransactionsProvider = FutureProvider.autoDispose<List<Map<String, dynamic>>>((ref) async {
   final supabase = Supabase.instance.client;
   
-  // RLS o'zi ajratib beradi (admin hammasini, user o'zini ko'radi)
+  // RLS (Xavfsizlik qoidalari) o'zi avtomatik ravishda 
+  // Admin bo'lsa hammasini, Xodim bo'lsa faqat o'zinikini ajratib beradi.
   final response = await supabase
       .from('transactions')
       .select()
       .order('created_at', ascending: false)
-      .limit(5); // Faqat oxirgi 5 tasini olamiz
+      .limit(5); 
       
   return List<Map<String, dynamic>>.from(response);
 });
+
+// --------------------------------------------------------
+// 4. HOLATNI YANGILASH FUNKSIYASI (Tasdiqlash/Rad etish)
+// --------------------------------------------------------
+final transactionRepoProvider = Provider((ref) => TransactionRepository());
+
+class TransactionRepository {
+  Future<void> updateSalaryStatus({required String salaryId, required String newStatus}) async {
+    await Supabase.instance.client
+        .from('salaries')
+        .update({'status': newStatus})
+        .eq('id', salaryId);
+  }
+}
