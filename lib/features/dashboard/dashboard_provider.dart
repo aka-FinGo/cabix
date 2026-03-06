@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-
+import 'package:fl_chart/fl_chart.dart';
 // --------------------------------------------------------
 // 1. FILTRLAR (Vaqt va Xodim)
 // --------------------------------------------------------
