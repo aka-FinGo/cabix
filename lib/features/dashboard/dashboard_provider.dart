@@ -76,7 +76,14 @@ final annualReportProvider = FutureProvider.autoDispose<List<Map<String, dynamic
   for (var tx in res) {
     int m = DateTime.parse(tx['created_at']).month - 1;
     if (tx['type'] == 'income') data[m]['income'] += tx['amount']; else data[m]['expense'] += tx['amount'];
-  }
-  return data;
+   return data;
 });
+
+// OXIRGI AMALLAR (Yangi dizayn uchun zarur)
+final recentTransactionsProvider = FutureProvider.autoDispose<List<Map<String, dynamic>>>((ref) async {
+  final empId = ref.watch(selectedEmployeeFilterProvider) ?? Supabase.instance.client.auth.currentUser?.id;
+  final res = await Supabase.instance.client.from('transactions').select().eq('user_id', empId!).order('created_at', ascending: false).limit(10);
+  return List<Map<String, dynamic>>.from(res);
+});
+
 
