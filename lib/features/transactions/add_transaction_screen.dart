@@ -117,7 +117,6 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
       if (mounted) {
         // Barcha ro'yxatlar va grafiklarni yangilashga buyruq
         ref.invalidate(statsProvider);
-        ref.invalidate(recentTransactionsProvider);
         ref.invalidate(pendingSalariesProvider); // Tasdiqlash ro'yxatini ham yangilash
 
         ScaffoldMessenger.of(context).showSnackBar(
