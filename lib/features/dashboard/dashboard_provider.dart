@@ -17,7 +17,13 @@ final employeesProvider = FutureProvider.autoDispose<List<Map<String, dynamic>>>
       .order('full_name');
   return List<Map<String, dynamic>>.from(response);
 });
-
+// PROFIL MA'LUMOTLARINI OLISH (AppBar uchun)
+final userProfileProvider = FutureProvider.autoDispose<Map<String, dynamic>>((ref) async {
+  final user = Supabase.instance.client.auth.currentUser;
+  if (user == null) return {};
+  final res = await Supabase.instance.client.from('profiles').select().eq('id', user.id).single();
+  return res;
+});
 // --------------------------------------------------------
 // 3. STATISTIKA (Balans, Kirim, Chiqim)
 // --------------------------------------------------------
@@ -67,33 +73,36 @@ final pendingSalariesProvider = FutureProvider.autoDispose<List<Map<String, dyna
   return List<Map<String, dynamic>>.from(response);
 });
 
-// --------------------------------------------------------
-// 5. YILLIK HISOBOT (Jadval va Grafik uchun)
-// --------------------------------------------------------
-final annualReportProvider = FutureProvider.autoDispose<List<Map<String, dynamic>>>((ref) async {
+// DINAMIK GRAFIK MA'LUMOTLARI (Vaqtga qarab o'zgaradi)
+final chartDataProvider = FutureProvider.autoDispose<List<FlSpot>>((ref) async {
+  final period = ref.watch(selectedPeriodProvider);
+  final empId = ref.watch(selectedEmployeeFilterProvider) ?? Supabase.instance.client.auth.currentUser?.id;
   final supabase = Supabase.instance.client;
-  final employeeId = ref.watch(selectedEmployeeFilterProvider) ?? supabase.auth.currentUser?.id;
-  if (employeeId == null) return [];
 
-  final now = DateTime.now();
-  final response = await supabase
-      .from('transactions')
-      .select('type, amount, created_at')
-      .eq('user_id', employeeId)
-      .gte('created_at', '${now.year}-01-01');
+  DateTime now = DateTime.now();
+  DateTime startDate;
 
-  List<Map<String, dynamic>> monthlyData = List.generate(12, (index) => {
-    'month': index, 'income': 0.0, 'expense': 0.0,
-  });
+  // Vaqt oralig'ini belgilash
+  if (period == 'Kun') startDate = DateTime(now.year, now.month, now.day);
+  else if (period == 'Hafta') startDate = now.subtract(const Duration(days: 7));
+  else if (period == 'Oy') startDate = DateTime(now.year, now.month, 1);
+  else startDate = DateTime(now.year, 1, 1);
 
-  for (var tx in response) {
-    final date = DateTime.parse(tx['created_at']);
-    final month = date.month - 1;
-    final amount = (tx['amount'] as num?)?.toDouble() ?? 0.0;
-    if (tx['type'] == 'income') monthlyData[month]['income'] += amount;
-    else monthlyData[month]['expense'] += amount;
+  final res = await supabase.from('transactions')
+      .select('amount, created_at')
+      .eq('user_id', empId!)
+      .gte('created_at', startDate.toIso8601String())
+      .order('created_at');
+
+  // Ma'lumotlarni grafik nuqtalariga aylantirish
+  List<FlSpot> spots = [];
+  for (int i = 0; i < res.length; i++) {
+    final amount = (res[i]['amount'] as num).toDouble() / 1000000; // Mln so'mda
+    spots.add(FlSpot(i.toDouble(), amount));
   }
-  return monthlyData;
+  
+  if (spots.isEmpty) spots = [const FlSpot(0, 0)]; // Bo'sh bo'lsa xato bermasligi uchun
+  return spots;
 });
 
 // --------------------------------------------------------
