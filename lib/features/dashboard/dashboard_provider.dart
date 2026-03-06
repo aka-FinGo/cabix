@@ -2,24 +2,24 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:fl_chart/fl_chart.dart';
 
-// 1. FILTRLAR
+// 1. FILTRLAR (Vaqt va Xodim)
 final selectedPeriodProvider = StateProvider<String>((ref) => 'Oy');
 final selectedEmployeeFilterProvider = StateProvider<String?>((ref) => null);
 
-// 2. PROFIL (AppBar uchun)
+// 2. PROFIL MA'LUMOTLARI (AppBar uchun)
 final userProfileProvider = FutureProvider.autoDispose<Map<String, dynamic>>((ref) async {
   final user = Supabase.instance.client.auth.currentUser;
   if (user == null) return {};
   return await Supabase.instance.client.from('profiles').select().eq('id', user.id).single();
 });
 
-// 3. XODIMLAR (Admin filtr uchun)
+// 3. XODIMLAR RO'YXATI (Admin filtr uchun)
 final employeesProvider = FutureProvider.autoDispose<List<Map<String, dynamic>>>((ref) async {
   final res = await Supabase.instance.client.from('profiles').select('id, full_name').order('full_name');
   return List<Map<String, dynamic>>.from(res);
 });
 
-// 4. STATISTIKA
+// 4. STATISTIKA (Balans, Kirim, Chiqim)
 final statsProvider = FutureProvider.autoDispose<Map<String, double>>((ref) async {
   final supabase = Supabase.instance.client;
   final empId = ref.watch(selectedEmployeeFilterProvider) ?? supabase.auth.currentUser?.id;
@@ -29,22 +29,23 @@ final statsProvider = FutureProvider.autoDispose<Map<String, double>>((ref) asyn
 
   for (var tx in res) {
     final amt = (tx['amount'] as num?)?.toDouble() ?? 0.0;
-    if (tx['type'] == 'income') income += amt; else expense += amt;
+    if (tx['type'] == 'income' || tx['type'] == 'kirim') income += amt; else expense += amt;
   }
   return {'balance': income - expense, 'income': income, 'expense': expense};
 });
 
-// 5. DINAMIK GRAFIK (Filtrga qarab o'zgaradi)
+// 5. DINAMIK GRAFIK NUQTALARI (Filtrga ulandi!)
 final chartSpotsProvider = FutureProvider.autoDispose<List<FlSpot>>((ref) async {
   final period = ref.watch(selectedPeriodProvider);
   final empId = ref.watch(selectedEmployeeFilterProvider) ?? Supabase.instance.client.auth.currentUser?.id;
   final supabase = Supabase.instance.client;
 
   DateTime now = DateTime.now();
-  DateTime start = DateTime(now.year, now.month, 1);
+  DateTime start;
   if (period == 'Kun') start = DateTime(now.year, now.month, now.day);
   else if (period == 'Hafta') start = now.subtract(const Duration(days: 7));
   else if (period == 'Yil') start = DateTime(now.year, 1, 1);
+  else start = DateTime(now.year, now.month, 1); // Oy
 
   final res = await supabase.from('transactions')
       .select('amount, created_at')
@@ -56,7 +57,7 @@ final chartSpotsProvider = FutureProvider.autoDispose<List<FlSpot>>((ref) async 
   return List.generate(res.length, (i) => FlSpot(i.toDouble(), (res[i]['amount'] as num).toDouble() / 1000000));
 });
 
-// 6. TASDIQLASH KUTILAYOTGANLAR (Xatoni tuzatuvchi provayder)
+// 6. TASDIQLASH KUTILAYOTGANLAR (Badge va Notif uchun)
 final pendingSalariesProvider = FutureProvider.autoDispose<List<Map<String, dynamic>>>((ref) async {
   final user = Supabase.instance.client.auth.currentUser;
   if (user == null) return [];
@@ -65,7 +66,7 @@ final pendingSalariesProvider = FutureProvider.autoDispose<List<Map<String, dyna
   return List<Map<String, dynamic>>.from(res);
 });
 
-// 7. YILLIK JADVAL
+// 7. YILLIK HISOBOT JADVALI
 final annualReportProvider = FutureProvider.autoDispose<List<Map<String, dynamic>>>((ref) async {
   final empId = ref.watch(selectedEmployeeFilterProvider) ?? Supabase.instance.client.auth.currentUser?.id;
   final res = await Supabase.instance.client.from('transactions').select().eq('user_id', empId!).gte('created_at', '${DateTime.now().year}-01-01');
@@ -78,6 +79,7 @@ final annualReportProvider = FutureProvider.autoDispose<List<Map<String, dynamic
   return data;
 });
 
+// OXIRGI AMALLAR
 final recentTransactionsProvider = FutureProvider.autoDispose<List<Map<String, dynamic>>>((ref) async {
   final empId = ref.watch(selectedEmployeeFilterProvider) ?? Supabase.instance.client.auth.currentUser?.id;
   final res = await Supabase.instance.client.from('transactions').select().eq('user_id', empId!).order('created_at', ascending: false).limit(10);
