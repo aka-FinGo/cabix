@@ -47,14 +47,48 @@ class MainWrapper extends ConsumerWidget {
           Expanded(child: navigationShell),
         ],
       ),
-      bottomNavigationBar: isWeb ? null : NavigationBar(
-        selectedIndex: navigationShell.currentIndex,
-        onDestinationSelected: (i) => navigationShell.goBranch(i),
-        destinations: const [
-          NavigationDestination(icon: Icon(Icons.grid_view), label: 'Bosh'),
-          NavigationDestination(icon: Icon(Icons.payments), label: 'Ish haqi'),
-          NavigationDestination(icon: Icon(Icons.bar_chart), label: 'Hisobot'),
-          NavigationDestination(icon: Icon(Icons.settings), label: 'Sozlamalar'),
+      floatingActionButtonLocation: isWeb ? null : FloatingActionButtonLocation.centerDocked,
+      floatingActionButton: isWeb ? null : FloatingActionButton(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+        onPressed: () => context.push('/add-transaction'),
+        backgroundColor: const Color(0xFF2EAF9B),
+        elevation: 4,
+        child: const Icon(Icons.add_card, color: Colors.white, size: 28),
+      ),
+      bottomNavigationBar: isWeb ? null : BottomAppBar(
+        shape: const CircularNotchedRectangle(),
+        notchMargin: 8.0,
+        color: theme == AppThemeMode.glass ? const Color(0xFF1E1E2C).withOpacity(0.9) : Colors.white,
+        elevation: 8,
+        child: SizedBox(
+          height: 60,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              _buildNavItem(context, icon: Icons.grid_view, label: 'Bosh', index: 0, currentIndex: navigationShell.currentIndex, theme: theme),
+              _buildNavItem(context, icon: Icons.payments, label: 'Ish haqi', index: 1, currentIndex: navigationShell.currentIndex, theme: theme),
+              const SizedBox(width: 48), // FAB uchun o'rtada bo'shliq
+              _buildNavItem(context, icon: Icons.bar_chart, label: 'Hisobot', index: 2, currentIndex: navigationShell.currentIndex, theme: theme),
+              _buildNavItem(context, icon: Icons.settings, label: 'Sozlamalar', index: 3, currentIndex: navigationShell.currentIndex, theme: theme),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildNavItem(BuildContext context, {required IconData icon, required String label, required int index, required int currentIndex, required AppThemeMode theme}) {
+    final isSelected = index == currentIndex;
+    final color = isSelected ? const Color(0xFF2EAF9B) : Colors.grey;
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: () => navigationShell.goBranch(index),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(icon, color: color, size: isSelected ? 28 : 24),
+          Text(label, style: TextStyle(color: color, fontSize: 10, fontWeight: isSelected ? FontWeight.bold : FontWeight.normal)),
         ],
       ),
     );
