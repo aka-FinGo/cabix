@@ -80,6 +80,10 @@ final GoRouter _router = GoRouter(
       path: '/add-transaction',
       builder: (context, state) => const AddTransactionScreen(),
     ),
+    GoRoute(
+      path: '/notifications',
+      builder: (context, state) => const NotificationsScreen(),
+    ),
     StatefulShellRoute.indexedStack(
       builder: (context, state, navigationShell) {
         return MainWrapper(navigationShell: navigationShell);
