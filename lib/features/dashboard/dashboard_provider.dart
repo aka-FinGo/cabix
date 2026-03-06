@@ -2,15 +2,16 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:fl_chart/fl_chart.dart';
 
-// 1. FILTRLAR (Vaqt va Xodim)
+// 1. FILTRLAR
 final selectedPeriodProvider = StateProvider<String>((ref) => 'Oy');
 final selectedEmployeeFilterProvider = StateProvider<String?>((ref) => null);
 
-// 2. PROFIL MA'LUMOTLARI (AppBar uchun)
+// 2. FOYDALANUVCHI PROFILI (AppBar uchun)
 final userProfileProvider = FutureProvider.autoDispose<Map<String, dynamic>>((ref) async {
   final user = Supabase.instance.client.auth.currentUser;
   if (user == null) return {};
-  return await Supabase.instance.client.from('profiles').select().eq('id', user.id).single();
+  final res = await Supabase.instance.client.from('profiles').select().eq('id', user.id).single();
+  return res;
 });
 
 // 3. XODIMLAR RO'YXATI (Admin filtr uchun)
@@ -34,7 +35,7 @@ final statsProvider = FutureProvider.autoDispose<Map<String, double>>((ref) asyn
   return {'balance': income - expense, 'income': income, 'expense': expense};
 });
 
-// 5. DINAMIK GRAFIK NUQTALARI (Filtrga ulandi!)
+// 5. DINAMIK GRAFIK NUQTALARI (Filtrga ulandi)
 final chartSpotsProvider = FutureProvider.autoDispose<List<FlSpot>>((ref) async {
   final period = ref.watch(selectedPeriodProvider);
   final empId = ref.watch(selectedEmployeeFilterProvider) ?? Supabase.instance.client.auth.currentUser?.id;
