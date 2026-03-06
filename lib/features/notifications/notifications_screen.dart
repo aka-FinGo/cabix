@@ -60,18 +60,23 @@ class NotificationsScreen extends ConsumerWidget {
 
               return Slidable(
                 key: ValueKey(item['id']),
-                // O'ng tomonga surilganda (Swipe left) chiqadigan tugmalar
                 endActionPane: ActionPane(
-                  motion: const ScrollMotion(),
-                  extentRatio: 0.5, // 2 ta tugma uchun qancha joy egallashi
+                  motion: const StretchMotion(), // Yaxshiroq animatsiya
+                  extentRatio: 0.5, // 2 ta tugma uchun
                   children: [
                     // Rad etish (Qizil)
                     SlidableAction(
                       onPressed: (context) async {
-                        await ref.read(transactionRepoProvider).updateSalaryStatus(salaryId: item['id'], newStatus: 'rejected');
-                        ref.invalidate(pendingSalariesProvider);
+                        try {
+                          await ref.read(transactionRepoProvider).updateSalaryStatus(salaryId: item['id'], newStatus: 'rejected');
+                          ref.invalidate(pendingSalariesProvider);
+                          ref.invalidate(salariesProvider); // Ro'yxat yangilanishi uchun
+                          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Rad etildi'), backgroundColor: Colors.red));
+                        } catch(e) {
+                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Xatolik: $e'), backgroundColor: Colors.red));
+                        }
                       },
-                      backgroundColor: const Color(0xFFFF8A8A), // Rasmga o'xshash qizg'ish
+                      backgroundColor: const Color(0xFFFF8A8A), 
                       foregroundColor: Colors.white,
                       icon: Icons.close,
                       label: 'Rad etish',
@@ -79,11 +84,17 @@ class NotificationsScreen extends ConsumerWidget {
                     // Tasdiqlash (Yashil)
                     SlidableAction(
                       onPressed: (context) async {
-                        await ref.read(transactionRepoProvider).updateSalaryStatus(salaryId: item['id'], newStatus: 'confirmed');
-                        ref.invalidate(pendingSalariesProvider);
-                        ref.invalidate(statsProvider);
+                        try {
+                          await ref.read(transactionRepoProvider).updateSalaryStatus(salaryId: item['id'], newStatus: 'confirmed');
+                          ref.invalidate(pendingSalariesProvider);
+                          ref.invalidate(salariesProvider);
+                          ref.invalidate(statsProvider);
+                          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Tasdiqlandi'), backgroundColor: Colors.green));
+                        } catch(e) {
+                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Xatolik: $e'), backgroundColor: Colors.red));
+                        }
                       },
-                      backgroundColor: const Color(0xFF48D1CC), // Rasmga o'xshash yashil-ko'k
+                      backgroundColor: const Color(0xFF48D1CC),
                       foregroundColor: Colors.white,
                       icon: Icons.check,
                       label: 'Tasdiqlash',
