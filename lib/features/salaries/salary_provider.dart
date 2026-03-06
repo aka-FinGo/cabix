@@ -14,8 +14,17 @@ final salariesProvider = FutureProvider.autoDispose<List<Map<String, dynamic>>>(
   var query = supabase.from('salaries').select('*, profiles!salaries_user_id_fkey(full_name), creator:profiles!salaries_created_by_fkey(full_name)').order('created_at', ascending: false);
 
   if (!isAdmin) {
-    query = query.eq('user_id', user.id);
+    // We must await final filter builder, no dynamic reassignment over PostgrestTransformBuilder directly 
+    // without matching types. Instead we specify filter builder explicitly.
+    final response = await supabase.from('salaries')
+        .select('*, profiles!salaries_user_id_fkey(full_name), creator:profiles!salaries_created_by_fkey(full_name)')
+        .eq('user_id', user.id)
+        .order('created_at', ascending: false);
+    return List<Map<String, dynamic>>.from(response);
   }
+
+  final response = await query;
+  return List<Map<String, dynamic>>.from(response);
 
   final response = await query;
   return List<Map<String, dynamic>>.from(response);
@@ -29,16 +38,16 @@ final pendingSalariesCountProvider = FutureProvider.autoDispose<int>((ref) async
   if (user == null) return 0;
   
   final isAdmin = user.appMetadata['is_admin'] == true;
-  var query = supabase.from('salaries').select('id', const FetchOptions(count: CountOption.exact)).eq('status', 'pending');
-  
+  var queryBuilder = supabase.from('salaries').select('id', const FetchOptions(count: CountOption.exact)).eq('status', 'pending');
+  // Avoid re-assigning builder type to dynamic, apply conditionally then await:
+  PostgrestResponse res;
   if (isAdmin) {
     // Admin o'zi yozganini tasdiqlamaydi
-    query = query.neq('created_by', user.id);
+    res = await supabase.from('salaries').select('id', const FetchOptions(count: CountOption.exact)).eq('status', 'pending').neq('created_by', user.id);
   } else {
     // xodim faqat o'ziga tegishli va o'zi yozmagan (admin yozgan)larni tasdiqlaydi
-    query = query.eq('user_id', user.id).neq('created_by', user.id);
+    res = await supabase.from('salaries').select('id', const FetchOptions(count: CountOption.exact)).eq('status', 'pending').eq('user_id', user.id).neq('created_by', user.id);
   }
   
-  final res = await query;
-  return res.length; 
+  return res.count ?? 0; 
 });
