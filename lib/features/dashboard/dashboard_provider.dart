@@ -75,8 +75,13 @@ final annualReportProvider = FutureProvider.autoDispose<List<Map<String, dynamic
   List<Map<String, dynamic>> data = List.generate(12, (i) => {'month': i, 'income': 0.0, 'expense': 0.0});
   for (var tx in res) {
     int m = DateTime.parse(tx['created_at']).month - 1;
-    if (tx['type'] == 'income') data[m]['income'] += tx['amount']; else data[m]['expense'] += tx['amount'];
-   return data;
+    if (tx['type'] == 'income') {
+      data[m]['income'] += tx['amount'];
+    } else {
+      data[m]['expense'] += tx['amount'];
+    }
+  }
+  return data;
 });
 
 // OXIRGI AMALLAR (Yangi dizayn uchun zarur)
