@@ -16,10 +16,11 @@ class MainWrapper extends ConsumerWidget {
     final profile = ref.watch(userProfileProvider);
     final theme = ref.watch(themeProvider);
 
-    return Scaffold(
+    final scaffold = Scaffold(
+      backgroundColor: theme == AppThemeMode.glass ? Colors.transparent : null,
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0.5,
+        backgroundColor: theme == AppThemeMode.glass ? Colors.transparent : Colors.white,
+        elevation: theme == AppThemeMode.glass ? 0 : 0.5,
         title: profile.when(
           data: (p) => Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -34,8 +35,12 @@ class MainWrapper extends ConsumerWidget {
         actions: [
           _buildNotificationBell(ref, context), // TO'G'RI CHAQUV
           IconButton(
-            icon: Icon(theme == AppThemeMode.glass ? Icons.dark_mode : Icons.light_mode),
-            onPressed: () => ref.read(themeProvider.notifier).setTheme(theme == AppThemeMode.glass ? AppThemeMode.standard : AppThemeMode.glass),
+            icon: Icon(
+              theme == AppThemeMode.standard ? Icons.light_mode :
+              theme == AppThemeMode.dark ? Icons.dark_mode :
+              Icons.blur_on
+            ),
+            onPressed: () => ref.read(themeProvider.notifier).toggleTheme(),
           ),
           IconButton(icon: const Icon(Icons.logout, color: Colors.red), onPressed: () => Supabase.instance.client.auth.signOut()),
           const SizedBox(width: 8),
@@ -75,6 +80,21 @@ class MainWrapper extends ConsumerWidget {
         ),
       ),
     );
+
+    if (theme == AppThemeMode.glass) {
+      return Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [Color(0xFF8EC5FC), Color(0xFFE0C3FC)],
+          ),
+        ),
+        child: scaffold,
+      );
+    }
+
+    return scaffold;
   }
 
   Widget _buildNavItem(BuildContext context, {required IconData icon, required String label, required int index, required int currentIndex, required AppThemeMode theme}) {
