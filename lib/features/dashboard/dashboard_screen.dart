@@ -24,10 +24,10 @@ class DashboardScreen extends ConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text("Moliyaviy Holat", style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+              const Text("Moliyaviy Dinamika", style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
               const SizedBox(height: 24),
 
-              // 1. KARTALAR
+              // KARTALAR
               statsAsync.when(
                 data: (stats) => GridView.count(
                   shrinkWrap: true,
@@ -48,15 +48,15 @@ class DashboardScreen extends ConsumerWidget {
               
               const SizedBox(height: 32),
 
-              // 2. OYLIK DINAMIKA (12 OY)
-              const Text("Oylik Dinamika (Yillik)", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+              // 12 OYLIK PROFESSIONAL GRAFIK
+              const Text("Yillik Hisobot (Oylar kesimida)", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
               const SizedBox(height: 16),
               _buildMonthlyAreaChart(),
               
               const SizedBox(height: 32),
 
-              // 3. OXIRGI AMALLAR
-              const Text("Oxirgi amallar", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+              // OXIRGI AMALLAR
+              const Text("Oxirgi amallar", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
               const SizedBox(height: 16),
               _buildTransactionsList(ref),
             ],
@@ -77,11 +77,7 @@ class DashboardScreen extends ConsumerWidget {
       ),
       child: LineChart(
         LineChartData(
-          gridData: FlGridData(
-            show: true,
-            drawVerticalLine: false,
-            getDrawingHorizontalLine: (v) => FlLine(color: Colors.grey.shade100, strokeWidth: 1),
-          ),
+          gridData: FlGridData(show: true, drawVerticalLine: false, getDrawingHorizontalLine: (v) => FlLine(color: Colors.grey.shade100, strokeWidth: 1)),
           titlesData: FlTitlesData(
             rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
             topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
@@ -95,7 +91,6 @@ class DashboardScreen extends ConsumerWidget {
                   if (v.toInt() >= 0 && v.toInt() < months.length) {
                     return SideTitleWidget(
                       axisSide: m.axisSide,
-                      space: 10,
                       child: Text(months[v.toInt()], style: const TextStyle(fontSize: 10, color: Colors.grey, fontWeight: FontWeight.bold)),
                     );
                   }
@@ -105,25 +100,22 @@ class DashboardScreen extends ConsumerWidget {
             ),
           ),
           borderData: FlBorderData(show: false),
-          minX: 0,
-          maxX: 11,
+          minX: 0, maxX: 11, // 12 ta oy
           lineBarsData: [
             LineChartBarData(
-              // Spots: 0 - Yanvar, 11 - Dekabr. Hozircha namunaviy ma'lumotlar.
               spots: const [
-                FlSpot(0, 2.5), FlSpot(1, 1.8), FlSpot(2, 5), FlSpot(3, 3.2), 
-                FlSpot(4, 4.5), FlSpot(5, 3.8), FlSpot(6, 6), FlSpot(7, 5.2),
-                FlSpot(8, 7), FlSpot(9, 6.5), FlSpot(10, 8), FlSpot(11, 7.5),
+                FlSpot(0, 3), FlSpot(1, 4.5), FlSpot(2, 3.8), FlSpot(3, 6), 
+                FlSpot(4, 5.2), FlSpot(5, 7.5), FlSpot(6, 6.8), FlSpot(7, 8.2),
+                FlSpot(8, 7.1), FlSpot(9, 9), FlSpot(10, 8.5), FlSpot(11, 10),
               ],
               isCurved: true,
               color: const Color(0xFF2EAF9B),
               barWidth: 5,
-              isStrokeCapRound: true,
-              dotData: const FlDotData(show: false), // Nuqtalarni yashiramiz, toza chiqishi uchun
+              dotData: const FlDotData(show: false),
               belowBarData: BarAreaData(
                 show: true,
                 gradient: LinearGradient(
-                  colors: [const Color(0xFF2EAF9B).withOpacity(0.4), const Color(0xFF2EAF9B).withOpacity(0.01)],
+                  colors: [const Color(0xFF2EAF9B).withOpacity(0.4), const Color(0xFF2EAF9B).withOpacity(0.0)],
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                 ),
@@ -142,21 +134,20 @@ class DashboardScreen extends ConsumerWidget {
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
         itemCount: list.length,
-        itemBuilder: (context, i) => Container(
+        itemBuilder: (context, i) => Card(
+          elevation: 0,
           margin: const EdgeInsets.only(bottom: 8),
-          decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           child: ListTile(
-            leading: CircleAvatar(
-              backgroundColor: list[i]['type'] == 'income' ? Colors.green.withOpacity(0.1) : Colors.red.withOpacity(0.1),
-              child: Icon(list[i]['type'] == 'income' ? Icons.south_west : Icons.north_east, size: 16, color: list[i]['type'] == 'income' ? Colors.green : Colors.red),
-            ),
+            leading: Icon(list[i]['type'] == 'income' ? Icons.south_west : Icons.north_east, 
+                        color: list[i]['type'] == 'income' ? Colors.green : Colors.red),
             title: Text(list[i]['category'] ?? 'Boshqa', style: const TextStyle(fontWeight: FontWeight.bold)),
             subtitle: Text(list[i]['created_at'].toString().split('T')[0]),
-            trailing: Text("${list[i]['amount']} UZS", style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+            trailing: Text("${list[i]['amount']} UZS", style: const TextStyle(fontWeight: FontWeight.bold)),
           ),
         ),
       ),
-      loading: () => const Center(child: CircularProgressIndicator()),
+      loading: () => const CircularProgressIndicator(),
       error: (e, _) => Text(e.toString()),
     );
   }
@@ -172,32 +163,16 @@ class _StatCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white, 
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 10)],
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(color: color.withOpacity(0.1), shape: BoxShape.circle),
-            child: Icon(icon, color: color, size: 24),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start, 
-              mainAxisAlignment: MainAxisAlignment.center, 
-              children: [
-                Text(title, style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.grey)),
-                FittedBox(child: Text("$amount UZS", style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold))),
-              ],
-            ),
-          ),
-        ],
-      ),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20), boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 10)]),
+      child: Row(children: [
+        Icon(icon, color: color),
+        const SizedBox(width: 12),
+        Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.center, children: [
+          Text(title, style: const TextStyle(fontSize: 10, color: Colors.grey, fontWeight: FontWeight.bold)),
+          Text("$amount UZS", style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+        ]),
+      ]),
     );
   }
 }
