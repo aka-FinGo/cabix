@@ -80,16 +80,3 @@ final annualReportProvider = FutureProvider.autoDispose<List<Map<String, dynamic
   return data;
 });
 
-// OXIRGI AMALLAR
-final recentTransactionsProvider = FutureProvider.autoDispose<List<Map<String, dynamic>>>((ref) async {
-  final empId = ref.watch(selectedEmployeeFilterProvider) ?? Supabase.instance.client.auth.currentUser?.id;
-  final res = await Supabase.instance.client.from('transactions').select().eq('user_id', empId!).order('created_at', ascending: false).limit(10);
-  return List<Map<String, dynamic>>.from(res);
-});
-
-final transactionRepoProvider = Provider((ref) => TransactionRepository());
-class TransactionRepository {
-  Future<void> updateSalaryStatus({required String salaryId, required String newStatus}) async {
-    await Supabase.instance.client.from('salaries').update({'status': newStatus}).eq('id', salaryId);
-  }
-}
