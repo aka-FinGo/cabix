@@ -25,9 +25,6 @@ final salariesProvider = FutureProvider.autoDispose<List<Map<String, dynamic>>>(
 
   final response = await query;
   return List<Map<String, dynamic>>.from(response);
-
-  final response = await query;
-  return List<Map<String, dynamic>>.from(response);
 });
 
 // Tasdiqlanishi kutilayotgan oyliklarni sanash uchun (badge)
@@ -38,16 +35,15 @@ final pendingSalariesCountProvider = FutureProvider.autoDispose<int>((ref) async
   if (user == null) return 0;
   
   final isAdmin = user.appMetadata['is_admin'] == true;
-  var queryBuilder = supabase.from('salaries').select('id', const FetchOptions(count: CountOption.exact)).eq('status', 'pending');
-  // Avoid re-assigning builder type to dynamic, apply conditionally then await:
-  PostgrestResponse res;
+  List res;
+
   if (isAdmin) {
     // Admin o'zi yozganini tasdiqlamaydi
-    res = await supabase.from('salaries').select('id', const FetchOptions(count: CountOption.exact)).eq('status', 'pending').neq('created_by', user.id);
+    res = await supabase.from('salaries').select('id').eq('status', 'pending').neq('created_by', user.id);
   } else {
     // xodim faqat o'ziga tegishli va o'zi yozmagan (admin yozgan)larni tasdiqlaydi
-    res = await supabase.from('salaries').select('id', const FetchOptions(count: CountOption.exact)).eq('status', 'pending').eq('user_id', user.id).neq('created_by', user.id);
+    res = await supabase.from('salaries').select('id').eq('status', 'pending').eq('user_id', user.id).neq('created_by', user.id);
   }
   
-  return res.count ?? 0; 
+  return res.length;
 });
