@@ -1,9 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'package:intl/intl.dart';
 
 class DashboardWidgets {
-  static final formatter = NumberFormat('#,###', 'uz_UZ');
+  static String formatCurrency(num amount) {
+    String str = amount.truncate().toString();
+    String result = '';
+    int count = 0;
+    for (int i = str.length - 1; i >= 0; i--) {
+      if (count != 0 && count % 3 == 0 && str[i] != '-') {
+        result = ' ' + result;
+      }
+      result = str[i] + result;
+      count++;
+    }
+    return result;
+  }
 
   // FinTrack (Web) uchun Oq/Yengil soyali Karta
   static Widget buildWebStatCard({
@@ -116,7 +127,7 @@ class DashboardWidgets {
           ),
           const SizedBox(height: 8),
           Text(
-            "${formatter.format(balance)} UZS",
+            "${formatCurrency(balance)} UZS",
             style: const TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.bold),
           ),
         ],
@@ -139,7 +150,7 @@ class DashboardWidgets {
            Text(title, style: TextStyle(color: Colors.grey.shade600, fontSize: 12)),
            const SizedBox(height: 8),
            Text(
-             "${formatter.format(amount)}",
+             formatCurrency(amount),
              style: TextStyle(color: color, fontSize: 16, fontWeight: FontWeight.bold),
            ),
          ],
