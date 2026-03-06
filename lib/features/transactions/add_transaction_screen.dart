@@ -3,7 +3,16 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:go_router/go_router.dart';
-import '../dashboard/dashboard_provider.dart'; // Dashboard'ni yangilash uchun
+import '../dashboard/dashboard_provider.dart'; 
+
+// Xodimlarni bazadan olib keluvchi provayder (Admin ro'yxatdan tanlashi uchun)
+final employeesProvider = FutureProvider.autoDispose<List<Map<String, dynamic>>>((ref) async {
+  final response = await Supabase.instance.client
+      .from('profiles')
+      .select('id, full_name, is_super_admin')
+      .neq('is_super_admin', true); // Faqat xodimlarni olamiz
+  return List<Map<String, dynamic>>.from(response);
+});
 
 class AddTransactionScreen extends ConsumerStatefulWidget {
   const AddTransactionScreen({super.key});
@@ -18,17 +27,20 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
   final _descController = TextEditingController();
   
   bool _isLoading = false;
-  String _selectedType = 'income'; // 'income' yoki 'expense'
-  String _selectedCategory = '';
+  String _selectedType = 'income'; // 'income' (Kirim/Oylik) yoki 'expense' (Chiqim)
+  String _selectedCategory = 'Boshqa';
+  
+  String? _selectedEmployeeId; // Tanlangan xodim (Admin uchun)
 
-  // Tayyor kategoriyalar
-  final List<String> _incomeCategories = ['Sotuv', 'Xizmat', 'Qarz qaytimi', 'Boshqa'];
-  final List<String> _expenseCategories = ['Oziq-ovqat', 'Xomashyo', 'Arenda', 'Soliq', 'Oylik', 'Boshqa'];
+  final List<String> _incomeCategories = ['Oylik/Avans', 'Sotuv', 'Xizmat', 'Qarz qaytimi', 'Boshqa'];
+  final List<String> _expenseCategories = ['Oziq-ovqat', 'Xomashyo', 'Arenda', 'Soliq', 'Boshqa'];
 
   @override
   void initState() {
     super.initState();
-    _selectedCategory = _incomeCategories.first; // Boshlang'ich kategoriya
+    _selectedCategory = _incomeCategories.first;
+    // Boshlang'ich qiymat sifatida foydalanuvchining o'zini tanlaymiz
+    _selectedEmployeeId = Supabase.instance.client.auth.currentUser?.id;
   }
 
   @override
@@ -53,32 +65,68 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
 
     try {
       final user = Supabase.instance.client.auth.currentUser;
-      if (user == null) throw Exception("Foydalanuvchi topilmadi. Qayta logindan o'ting.");
+      if (user == null) throw Exception("Foydalanuvchi topilmadi.");
 
-      // Bazaga ma'lumotni yozish
-      await Supabase.instance.client.from('transactions').insert({
-        'user_id': user.id,
-        'type': _selectedType,
-        'amount': double.parse(_amountController.text.replaceAll(',', '')),
-        'category': _selectedCategory,
-        'description': _descController.text.trim(),
-      });
+      final isAdmin = user.appMetadata['is_admin'] == true;
+      final amount = double.parse(_amountController.text.replaceAll(',', ''));
+      final desc = "[$_selectedCategory] ${_descController.text.trim()}";
+
+      if (_selectedType == 'expense') {
+        // 1. CHIQIMLAR: Hech kim tasdiqlamaydi, to'g'ridan-to'g'ri transactions jadvaliga yoziladi
+        await Supabase.instance.client.from('transactions').insert({
+          'user_id': user.id,
+          'type': 'expense',
+          'amount': amount,
+          'category': _selectedCategory,
+          'description': _descController.text.trim(),
+        });
+      } else {
+        // 2. KIRIMLAR (Oylik, tushum, avans)
+        if (isAdmin) {
+          if (_selectedEmployeeId == user.id) {
+            // ADMIN O'ZI UCHUN: Avto tasdiq. 
+            await Supabase.instance.client.from('salaries').insert({
+              'user_id': user.id,
+              'created_by': user.id,
+              'amount_uzs': amount,
+              'comment': desc,
+              'status': 'confirmed' // Tasdiq talab qilinmaydi
+            });
+          } else {
+            // ADMIN XODIMGA: Xodim tasdiqlashi kutilyapti
+            await Supabase.instance.client.from('salaries').insert({
+              'user_id': _selectedEmployeeId,
+              'created_by': user.id, // Admin yozganini bildirish uchun
+              'amount_uzs': amount,
+              'comment': desc,
+              'status': 'pending'
+            });
+          }
+        } else {
+          // XODIM O'ZIGA: Admin tasdiqlashi kutilyapti
+          await Supabase.instance.client.from('salaries').insert({
+            'user_id': user.id,
+            'created_by': user.id,
+            'amount_uzs': amount,
+            'comment': desc,
+            'status': 'pending'
+          });
+        }
+      }
 
       if (mounted) {
-        // MUHIM: Dashboard'dagi ma'lumotlarni qayta yuklashga majbur qilamiz
+        // Barcha ro'yxatlar va grafiklarni yangilashga buyruq
         ref.invalidate(statsProvider);
         ref.invalidate(recentTransactionsProvider);
+        ref.invalidate(pendingSalariesProvider); // Tasdiqlash ro'yxatini ham yangilash
 
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Tranzaksiya muvaffaqiyatli saqlandi!"), backgroundColor: Colors.green),
+          const SnackBar(content: Text("Amal muvaffaqiyatli saqlandi!"), backgroundColor: Colors.green),
         );
-        
-        context.pop(); // Dashboardga qaytish
+        context.pop(); 
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Xatolik: $e"), backgroundColor: Colors.red),
-      );
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Xatolik: $e"), backgroundColor: Colors.red));
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -86,6 +134,8 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final user = Supabase.instance.client.auth.currentUser;
+    final isAdmin = user?.appMetadata['is_admin'] == true;
     final isIncome = _selectedType == 'income';
     final activeColor = isIncome ? Colors.green : Colors.red;
 
@@ -94,11 +144,8 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        title: const Text("Yangi Tranzaksiya", style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
-        leading: IconButton(
-          icon: const Icon(Icons.close, color: Colors.black),
-          onPressed: () => context.pop(),
-        ),
+        title: const Text("Yangi Amal", style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+        leading: IconButton(icon: const Icon(Icons.close, color: Colors.black), onPressed: () => context.pop()),
       ),
       body: SafeArea(
         child: Form(
@@ -111,12 +158,9 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // 1. KIRIM / CHIQIM TANLASH (Segmented Control o'rniga oddiy tugmalar)
+                      // 1. KIRIM / CHIQIM TANLASH
                       Container(
-                        decoration: BoxDecoration(
-                          color: Colors.grey.shade200,
-                          borderRadius: BorderRadius.circular(16),
-                        ),
+                        decoration: BoxDecoration(color: Colors.grey.shade200, borderRadius: BorderRadius.circular(16)),
                         padding: const EdgeInsets.all(4),
                         child: Row(
                           children: [
@@ -131,7 +175,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                                     boxShadow: isIncome ? [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 4)] : null,
                                   ),
                                   alignment: Alignment.center,
-                                  child: Text("KIRIM", style: TextStyle(fontWeight: FontWeight.bold, color: isIncome ? Colors.green : Colors.grey.shade600)),
+                                  child: Text("KIRIM (Oylik/Tushum)", style: TextStyle(fontWeight: FontWeight.bold, color: isIncome ? Colors.green : Colors.grey.shade600)),
                                 ),
                               ),
                             ),
@@ -153,26 +197,85 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                           ],
                         ),
                       ),
-                      const SizedBox(height: 32),
+                      const SizedBox(height: 24),
 
-                      // 2. SUMMA KIRITISH
+                      // 2. HOLAT (Shaffoflik qoidalari) HAQIDA OGOHLANTIRISH
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(color: activeColor.withOpacity(0.1), borderRadius: BorderRadius.circular(12)),
+                        child: Row(
+                          children: [
+                            Icon(Icons.info_outline, color: activeColor, size: 20),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                !isIncome 
+                                  ? "Chiqimlar darhol balansingizdan yechiladi."
+                                  : (isAdmin 
+                                      ? (_selectedEmployeeId == user?.id 
+                                          ? "Siz o'zingizga pul yozyapsiz. Bu amal darhol tasdiqlanadi." 
+                                          : "Bu amal xodim profiliga tushadi va u tasdiqlagandan so'ng hisoblanadi.")
+                                      : "Siz kiritgan summa tasdiqlash uchun Adminga yuboriladi."),
+                                style: TextStyle(color: activeColor, fontSize: 13),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+
+                      // 3. XODIMNI TANLASH (Faqat Admin va faqat Kirim bo'lsa)
+                      if (isAdmin && isIncome) ...[
+                        const Text("KIM UCHUN?", style: TextStyle(color: Colors.grey, fontSize: 12, fontWeight: FontWeight.bold)),
+                        const SizedBox(height: 8),
+                        Consumer(
+                          builder: (context, ref, child) {
+                            final employeesAsync = ref.watch(employeesProvider);
+                            return employeesAsync.when(
+                              data: (employees) {
+                                return DropdownButtonFormField<String>(
+                                  value: _selectedEmployeeId,
+                                  decoration: InputDecoration(
+                                    filled: true,
+                                    fillColor: Colors.white,
+                                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
+                                  ),
+                                  items: [
+                                    DropdownMenuItem(value: user?.id, child: const Text("Menga (O'zim uchun)")),
+                                    ...employees.map((e) => DropdownMenuItem(
+                                      value: e['id'], 
+                                      child: Text(e['full_name'] ?? 'Ismsiz xodim')
+                                    )),
+                                  ],
+                                  onChanged: (val) => setState(() => _selectedEmployeeId = val),
+                                );
+                              },
+                              loading: () => const LinearProgressIndicator(),
+                              error: (e, _) => Text("Xodimlarni yuklashda xato: $e"),
+                            );
+                          },
+                        ),
+                        const SizedBox(height: 24),
+                      ],
+
+                      // 4. SUMMA
                       const Text("SUMMA (UZS)", style: TextStyle(color: Colors.grey, fontSize: 12, fontWeight: FontWeight.bold)),
                       const SizedBox(height: 8),
                       TextFormField(
                         controller: _amountController,
                         keyboardType: const TextInputType.numberWithOptions(decimal: true),
                         inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}'))],
-                        style: TextStyle(fontSize: 36, fontWeight: FontWeight.bold, color: activeColor),
+                        style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: activeColor),
                         decoration: InputDecoration(
                           hintText: "0",
                           prefixIcon: Padding(
                             padding: const EdgeInsets.all(12.0),
-                            child: Text(isIncome ? "+" : "-", style: TextStyle(fontSize: 36, color: activeColor, fontWeight: FontWeight.bold)),
+                            child: Text(isIncome ? "+" : "-", style: TextStyle(fontSize: 32, color: activeColor, fontWeight: FontWeight.bold)),
                           ),
                           border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
                           filled: true,
                           fillColor: Colors.white,
-                          contentPadding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
                         ),
                         validator: (value) {
                           if (value == null || value.isEmpty) return "Summani kiriting";
@@ -182,7 +285,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                       ),
                       const SizedBox(height: 24),
 
-                      // 3. KATEGORIYA TANLASH
+                      // 5. KATEGORIYA 
                       const Text("KATEGORIYA", style: TextStyle(color: Colors.grey, fontSize: 12, fontWeight: FontWeight.bold)),
                       const SizedBox(height: 12),
                       Wrap(
@@ -193,29 +296,24 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                           return ChoiceChip(
                             label: Text(category),
                             selected: isSelected,
-                            onSelected: (selected) {
-                              if (selected) setState(() => _selectedCategory = category);
-                            },
+                            onSelected: (selected) { if (selected) setState(() => _selectedCategory = category); },
                             selectedColor: activeColor.withOpacity(0.2),
-                            labelStyle: TextStyle(
-                              color: isSelected ? activeColor : Colors.black87,
-                              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                            ),
+                            labelStyle: TextStyle(color: isSelected ? activeColor : Colors.black87, fontWeight: isSelected ? FontWeight.bold : FontWeight.normal),
                             backgroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12), side: const BorderSide(color: Colors.transparent)),
                           );
                         }).toList(),
                       ),
                       const SizedBox(height: 24),
 
-                      // 4. IZOH KIRITISH
+                      // 6. IZOH
                       const Text("IZOH (Ixtiyoriy)", style: TextStyle(color: Colors.grey, fontSize: 12, fontWeight: FontWeight.bold)),
                       const SizedBox(height: 8),
                       TextFormField(
                         controller: _descController,
-                        maxLines: 3,
+                        maxLines: 2,
                         decoration: InputDecoration(
-                          hintText: "Tranzaksiya haqida qisqacha...",
+                          hintText: "Masalan: Avans yoki material uchun...",
                           border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
                           filled: true,
                           fillColor: Colors.white,
@@ -226,13 +324,10 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                 ),
               ),
 
-              // 5. SAQLASH TUGMASI (Pastga qadab qo'yilgan)
+              // SAQLASH TUGMASI
               Container(
                 padding: const EdgeInsets.all(24),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, -5))],
-                ),
+                decoration: BoxDecoration(color: Colors.white, boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, -5))]),
                 child: SafeArea(
                   child: SizedBox(
                     width: double.infinity,
