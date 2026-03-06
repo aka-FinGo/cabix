@@ -25,24 +25,28 @@ class _MainWrapperState extends State<MainWrapper> {
     final bool isWeb = width > 800; // 800px dan keng bo'lsa Web deb hisoblaymiz
 
     return Scaffold(
-      // 1. HEADER (AppBar) - Har doim tepada
-      appBar: AppBar(
-        title: const Text('Cabix', style: TextStyle(fontWeight: FontWeight.bold)),
-        elevation: 1,
-        centerTitle: !isWeb,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.notifications_none),
-            onPressed: () {}, // Bildirishnomalar uchun
-          ),
-          IconButton(
-            icon: const Icon(Icons.logout_rounded),
-            onPressed: () => _signOut(context),
-            tooltip: 'Chiqish',
-          ),
-          const SizedBox(width: 8),
-        ],
-      ),
+      // 1. HEADER (AppBar) - DIQQAT: O'ZGARISH SHU YERDA!
+      // Faqat Webda (kompyuterda) oq AppBar chiqadi. 
+      // Telefonda (isWeb == false) null bo'ladi, ya'ni Dashboard'ning o'zidagi yashil AppBar ko'rinadi.
+      appBar: isWeb 
+        ? AppBar(
+            title: const Text('Cabix', style: TextStyle(fontWeight: FontWeight.bold)),
+            elevation: 1,
+            centerTitle: false,
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.notifications_none),
+                onPressed: () {}, // Bildirishnomalar uchun
+              ),
+              IconButton(
+                icon: const Icon(Icons.logout_rounded),
+                onPressed: () => _signOut(context),
+                tooltip: 'Chiqish',
+              ),
+              const SizedBox(width: 8),
+            ],
+          )
+        : null, // Telefonda oq AppBar butunlay yo'qoladi!
 
       // 2. BODY - Webda yon menyu bilan, Mobilda menyusiz
       body: Row(
@@ -88,12 +92,11 @@ class _MainWrapperState extends State<MainWrapper> {
       ),
       
       // Mobilda yangi amal qo'shish tugmasi
-      // FloatingActionButton qismini shunday o'zgartiring:
-floatingActionButton: isWeb ? null : FloatingActionButton(
-  onPressed: () => context.push('/add-transaction'), 
-  backgroundColor: const Color(0xFF2EAF9B),
-  child: const Icon(Icons.add, color: Colors.white),
-),
+      floatingActionButton: isWeb ? null : FloatingActionButton(
+        onPressed: () => context.push('/add-transaction'), 
+        backgroundColor: const Color(0xFF2EAF9B),
+        child: const Icon(Icons.add, color: Colors.white),
+      ),
     );
   }
 
