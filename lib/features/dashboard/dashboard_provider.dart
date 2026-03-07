@@ -66,18 +66,26 @@ final statsProvider =
       supabase.auth.currentUser?.id;
   double income = 0;
   double expense = 0;
-  final res = await supabase
+
+  // 1. Chiqimlarni olish
+  final txRes = await supabase
       .from('transactions')
       .select('type, amount')
       .eq('user_id', empId!);
-  for (var tx in res) {
-    final amt = (tx['amount'] as num?)?.toDouble() ?? 0.0;
-    if (tx['type'] == 'income' || tx['type'] == 'kirim') {
-      income += amt;
-    } else {
-      expense += amt;
-    }
+  for (var tx in txRes) {
+    expense += (tx['amount'] as num?)?.toDouble() ?? 0.0;
   }
+
+  // 2. Kirimlarni olish (confirmed salaries)
+  final salaryRes = await supabase
+      .from('salaries')
+      .select('amount_uzs')
+      .eq('user_id', empId)
+      .eq('status', 'confirmed');
+  for (var s in salaryRes) {
+    income += (s['amount_uzs'] as num?)?.toDouble() ?? 0.0;
+  }
+
   return {'balance': income - expense, 'income': income, 'expense': expense};
 });
 
@@ -100,17 +108,43 @@ final chartSpotsProvider =
   } else {
     start = DateTime(now.year, now.month, 1);
   }
-  final res = await supabase
+
+  final txRes = await supabase
       .from('transactions')
       .select('amount, created_at')
       .eq('user_id', empId!)
       .gte('created_at', start.toIso8601String())
       .order('created_at');
-  if (res.isEmpty) return [const FlSpot(0, 0)];
+
+  final salaryRes = await supabase
+      .from('salaries')
+      .select('amount_uzs, created_at')
+      .eq('user_id', empId)
+      .eq('status', 'confirmed')
+      .gte('created_at', start.toIso8601String())
+      .order('created_at');
+
+  List<Map<String, dynamic>> all = [];
+  for (var tx in txRes) {
+    all.add({
+      'amount': (tx['amount'] as num).toDouble(),
+      'created_at': tx['created_at']
+    });
+  }
+  for (var s in salaryRes) {
+    all.add({
+      'amount': (s['amount_uzs'] as num).toDouble(),
+      'created_at': s['created_at']
+    });
+  }
+
+  all.sort((a, b) => a['created_at'].compareTo(b['created_at']));
+
+  if (all.isEmpty) return [const FlSpot(0, 0)];
   return List.generate(
-      res.length,
+      all.length,
       (i) =>
-          FlSpot(i.toDouble(), (res[i]['amount'] as num).toDouble() / 1000000));
+          FlSpot(i.toDouble(), (all[i]['amount'] as num).toDouble() / 1000000));
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -183,13 +217,63 @@ final annualReportProvider =
 final recentTransactionsProvider =
     FutureProvider.autoDispose<List<Map<String, dynamic>>>((ref) async {
   ref.watch(dashboardRealtimeProvider); // Realtime triggerga ulanish
+  final supabase = Supabase.instance.client;
   final empId = ref.watch(selectedEmployeeFilterProvider) ??
-      Supabase.instance.client.auth.currentUser?.id;
-  final res = await Supabase.instance.client
+      supabase.auth.currentUser?.id;
+
+  final txRes = await supabase
       .from('transactions')
       .select()
       .eq('user_id', empId!)
       .order('created_at', ascending: false)
       .limit(10);
-  return List<Map<String, dynamic>>.from(res);
+
+  final salaryRes = await supabase
+      .from('salaries')
+      .select()
+      .eq('user_id', empId)
+      .eq('status', 'confirmed')
+      .order('created_at', ascending: false)
+      .limit(10);
+
+  List<Map<String, dynamic>> all = [];
+  for (var tx in txRes) {
+    all.add({...tx, 'type': 'expense'});
+  }
+  for (var s in salaryRes) {
+    all.add({
+      'id': s['id'],
+      'amount': s['amount_uzs'],
+      'type': 'income',
+      'category': 'Oylik/Kirim',
+      'comment': s['comment'],
+      'created_at': s['created_at'],
+    });
+  }
+
+  all.sort((a, b) =>
+      (b['created_at'] as String).compareTo(a['created_at'] as String));
+  return all.take(10).toList();
+});
+
+// 9. KATEGORIYA STATISTIKASI (Pie Chart uchun)
+final categoryStatsProvider =
+    FutureProvider.autoDispose<Map<String, double>>((ref) async {
+  ref.watch(dashboardRealtimeProvider);
+  final supabase = Supabase.instance.client;
+  final empId = ref.watch(selectedEmployeeFilterProvider) ??
+      supabase.auth.currentUser?.id;
+
+  // Xarajatlar kategoriyalari
+  final txRes = await supabase
+      .from('transactions')
+      .select('category, amount')
+      .eq('user_id', empId!);
+
+  Map<String, double> stats = {};
+  for (var tx in txRes) {
+    final cat = tx['category'] ?? 'Boshqa';
+    stats[cat] = (stats[cat] ?? 0) + (tx['amount'] as num).toDouble();
+  }
+  return stats;
 });

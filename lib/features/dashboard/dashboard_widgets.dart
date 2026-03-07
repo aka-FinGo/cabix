@@ -61,24 +61,33 @@ class DashboardWidgets {
           const SizedBox(height: 8),
           Text(
             "$amountStr UZS",
-            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Color(0xFF1E293B)),
+            style: const TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF1E293B)),
           ),
           if (trend != null) ...[
             const SizedBox(height: 12),
             Row(
               children: [
                 Icon(
-                  trend.contains('+') ? Icons.arrow_upward : Icons.arrow_downward,
+                  trend.contains('+')
+                      ? Icons.arrow_upward
+                      : Icons.arrow_downward,
                   size: 14,
                   color: trendColor ?? Colors.green,
                 ),
                 const SizedBox(width: 4),
                 Text(
                   trend,
-                  style: TextStyle(color: trendColor ?? Colors.green, fontWeight: FontWeight.bold, fontSize: 12),
+                  style: TextStyle(
+                      color: trendColor ?? Colors.green,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 12),
                 ),
                 const SizedBox(width: 8),
-                const Text("vs o'tgan oy", style: TextStyle(color: Colors.grey, fontSize: 12)),
+                const Text("vs o'tgan oy",
+                    style: TextStyle(color: Colors.grey, fontSize: 12)),
               ],
             )
           ]
@@ -116,46 +125,59 @@ class DashboardWidgets {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text("Boshqaruv markazi", style: TextStyle(color: Colors.white70, fontSize: 14)),
-              const Icon(Icons.account_balance_wallet, color: Colors.white, size: 28),
+              const Text("Boshqaruv markazi",
+                  style: TextStyle(color: Colors.white70, fontSize: 14)),
+              const Icon(Icons.account_balance_wallet,
+                  color: Colors.white, size: 28),
             ],
           ),
           const SizedBox(height: 32),
           Text(
             name.toUpperCase(),
-            style: const TextStyle(color: Colors.white, fontSize: 16, letterSpacing: 2, fontWeight: FontWeight.w500),
+            style: const TextStyle(
+                color: Colors.white,
+                fontSize: 16,
+                letterSpacing: 2,
+                fontWeight: FontWeight.w500),
           ),
           const SizedBox(height: 8),
           Text(
             "${formatCurrency(balance)} UZS",
-            style: const TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.bold),
+            style: const TextStyle(
+                color: Colors.white, fontSize: 32, fontWeight: FontWeight.bold),
           ),
         ],
       ),
     );
   }
-  
+
   // Mobil uchun kichik statistik ustunlar
   static Widget buildMobileStatItem(String title, double amount, Color color) {
-     return Container(
-       padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
-       decoration: BoxDecoration(
-         color: Colors.white,
-         borderRadius: BorderRadius.circular(20),
-         boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 10, offset: const Offset(0, 4))]
-       ),
-       child: Column(
-         crossAxisAlignment: CrossAxisAlignment.start,
-         children: [
-           Text(title, style: TextStyle(color: Colors.grey.shade600, fontSize: 12)),
-           const SizedBox(height: 8),
-           Text(
-             formatCurrency(amount),
-             style: TextStyle(color: color, fontSize: 16, fontWeight: FontWeight.bold),
-           ),
-         ],
-       ),
-     );
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+      decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+                color: Colors.black.withOpacity(0.04),
+                blurRadius: 10,
+                offset: const Offset(0, 4))
+          ]),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(title,
+              style: TextStyle(color: Colors.grey.shade600, fontSize: 12)),
+          const SizedBox(height: 8),
+          Text(
+            formatCurrency(amount),
+            style: TextStyle(
+                color: color, fontSize: 16, fontWeight: FontWeight.bold),
+          ),
+        ],
+      ),
+    );
   }
 
   // FinTrack uslubidagi BarChart (Dinamika)
@@ -165,10 +187,11 @@ class DashboardWidgets {
     for (var spot in spots) {
       if (spot.y > maxY) maxY = spot.y;
     }
-    
+
     // Agar chart bo'sh bo'lsa
     if (spots.isEmpty || (spots.length == 1 && spots[0].y == 0)) {
-        return const Center(child: Text("Ma'lumot yo'q", style: TextStyle(color: Colors.grey)));
+      return const Center(
+          child: Text("Ma'lumot yo'q", style: TextStyle(color: Colors.grey)));
     }
 
     return BarChart(
@@ -184,55 +207,85 @@ class DashboardWidgets {
               getTitlesWidget: (value, meta) {
                 // Oddiy sonlarni oy yoki kunga aylantirish mantiqi kerak bo'lsa shu yerda qilinadi
                 return Padding(
-                    padding: const EdgeInsets.only(top: 8), 
-                    child: Text(value.toInt().toString(), style: const TextStyle(color: Colors.grey, fontSize: 10))
-                );
+                    padding: const EdgeInsets.only(top: 8),
+                    child: Text(value.toInt().toString(),
+                        style:
+                            const TextStyle(color: Colors.grey, fontSize: 10)));
               },
             ),
           ),
-          leftTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-          topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-          rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+          leftTitles:
+              const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+          topTitles:
+              const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+          rightTitles:
+              const AxisTitles(sideTitles: SideTitles(showTitles: false)),
         ),
         gridData: FlGridData(
           show: true,
           drawVerticalLine: false,
           horizontalInterval: (maxY > 0 ? maxY / 3 : 1),
-          getDrawingHorizontalLine: (value) => FlLine(color: Colors.grey.withOpacity(0.1), strokeWidth: 1, dashArray: [5, 5]),
+          getDrawingHorizontalLine: (value) => FlLine(
+              color: Colors.grey.withOpacity(0.1),
+              strokeWidth: 1,
+              dashArray: [5, 5]),
         ),
         borderData: FlBorderData(show: false),
-        barGroups: spots.map((spot) => BarChartGroupData(
-          x: spot.x.toInt(),
-          barRods: [
-            BarChartRodData(
-              toY: spot.y,
-              color: const Color(0xFF3B82F6), // FinTrack Blue
-              width: 16,
-              borderRadius: BorderRadius.circular(4),
-              backDrawRodData: BackgroundBarChartRodData(
-                show: true, 
-                toY: maxY * 1.2, 
-                color: const Color(0xFFEFF6FF)
-              ),
-            ),
-          ],
-        )).toList(),
+        barGroups: spots
+            .map((spot) => BarChartGroupData(
+                  x: spot.x.toInt(),
+                  barRods: [
+                    BarChartRodData(
+                      toY: spot.y,
+                      color: const Color(0xFF3B82F6), // FinTrack Blue
+                      width: 16,
+                      borderRadius: BorderRadius.circular(4),
+                      backDrawRodData: BackgroundBarChartRodData(
+                          show: true,
+                          toY: maxY * 1.2,
+                          color: const Color(0xFFEFF6FF)),
+                    ),
+                  ],
+                ))
+            .toList(),
       ),
     );
   }
 
-  // Pie Chart (Xarajatlar bo'linishi) yengil versiyasi
-  static Widget buildPieChart() {
-     return PieChart(
-       PieChartData(
-         sectionsSpace: 4,
-         centerSpaceRadius: 40,
-         sections: [
-           PieChartSectionData(color: const Color(0xFF1E3A8A), value: 40, title: '40%', radius: 60, titleStyle: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)), // Dark Blue
-           PieChartSectionData(color: const Color(0xFF3B82F6), value: 35, title: '35%', radius: 60, titleStyle: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)), // Normal Blue
-           PieChartSectionData(color: const Color(0xFFBFDBFE), value: 25, title: '25%', radius: 60, titleStyle: const TextStyle(color: Colors.blueGrey, fontWeight: FontWeight.bold)), // Light Blue
-         ]
-       )
-     );
+  // Pie Chart (Xarajatlar bo'linishi) dinamik versiyasi
+  static Widget buildPieChart(Map<String, double> categoryStats) {
+    if (categoryStats.isEmpty) {
+      return const Center(
+          child: Text("Ma'lumot yo'q", style: TextStyle(color: Colors.grey)));
+    }
+
+    final total = categoryStats.values.fold(0.0, (sum, val) => sum + val);
+    final colors = [
+      const Color(0xFF1E3A8A),
+      const Color(0xFF3B82F6),
+      const Color(0xFFBFDBFE),
+      const Color(0xFF60A5FA),
+      const Color(0xFF93C5FD),
+    ];
+
+    int index = 0;
+    return PieChart(PieChartData(
+      sectionsSpace: 4,
+      centerSpaceRadius: 40,
+      sections: categoryStats.entries.map((entry) {
+        final color = colors[index % colors.length];
+        index++;
+        final percentage = (entry.value / total * 100).toStringAsFixed(1);
+        return PieChartSectionData(
+            color: color,
+            value: entry.value,
+            title: '$percentage%',
+            radius: 60,
+            titleStyle: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 12));
+      }).toList(),
+    ));
   }
 }
