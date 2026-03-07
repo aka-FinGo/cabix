@@ -1,0 +1,56 @@
+-- WARNING: This schema is for context only and is not meant to be run.
+-- Table order and constraints may not be valid for execution.
+
+CREATE TABLE public.profiles (
+  id uuid NOT NULL,
+  full_name text,
+  role text DEFAULT 'user'::text CHECK (role = ANY (ARRAY['admin'::text, 'user'::text, 'direktor'::text, 'kassir'::text])),
+  created_at timestamp with time zone DEFAULT now(),
+  is_super_admin boolean DEFAULT false,
+  CONSTRAINT profiles_pkey PRIMARY KEY (id),
+  CONSTRAINT profiles_id_fkey FOREIGN KEY (id) REFERENCES auth.users(id)
+);
+CREATE TABLE public.salaries (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  user_id uuid,
+  amount_uzs numeric NOT NULL,
+  amount_usd numeric DEFAULT 0,
+  exchange_rate numeric DEFAULT 1,
+  comment text,
+  created_by uuid,
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT now(),
+  deleted_at timestamp with time zone,
+  delete_reason text,
+  status text DEFAULT 'pending'::text CHECK (status = ANY (ARRAY['pending'::text, 'confirmed'::text, 'rejected'::text])),
+  CONSTRAINT salaries_pkey PRIMARY KEY (id),
+  CONSTRAINT salaries_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.profiles(id),
+  CONSTRAINT salaries_created_by_fkey FOREIGN KEY (created_by) REFERENCES public.profiles(id)
+);
+CREATE TABLE public.salary_audit_logs (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  salary_id uuid,
+  old_amount numeric,
+  new_amount numeric,
+  old_comment text,
+  new_comment text,
+  changed_by uuid,
+  changed_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT salary_audit_logs_pkey PRIMARY KEY (id),
+  CONSTRAINT salary_audit_logs_changed_by_fkey FOREIGN KEY (changed_by) REFERENCES public.profiles(id)
+);
+CREATE TABLE public.transactions (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  user_id uuid,
+  type text NOT NULL CHECK (type = ANY (ARRAY['income'::text, 'expense'::text])),
+  amount_uzs numeric,
+  amount_usd numeric DEFAULT 0,
+  exchange_rate numeric DEFAULT 1,
+  comment text,
+  created_at timestamp with time zone DEFAULT now(),
+  amount numeric DEFAULT 0,
+  category text,
+  description text,
+  CONSTRAINT transactions_pkey PRIMARY KEY (id),
+  CONSTRAINT transactions_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.profiles(id)
+);
