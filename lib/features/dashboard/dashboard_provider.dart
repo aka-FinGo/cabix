@@ -76,9 +76,7 @@ final statsProvider =
 
   final isAdmin = user.appMetadata['is_admin'] == true;
   final period = ref.watch(selectedPeriodProvider);
-  // Agar admin bo'lsa filter ishlatadi, bo'lmasa faqat o'zini.
   final requestedEmpId = ref.watch(selectedEmployeeFilterProvider);
-  final empId = isAdmin ? (requestedEmpId ?? user.id) : user.id;
 
   double totalIncome = 0;
   double totalExpense = 0;
@@ -100,25 +98,48 @@ final statsProvider =
     start = DateTime(now.year, now.month, 1);
   }
 
-  // 1. Chiqimlarni olish
-  final txRes = await supabase
-      .from('transactions')
-      .select('amount, created_at')
-      .eq('user_id', empId);
-  for (var tx in txRes) {
-    double amt = (tx['amount'] as num?)?.toDouble() ?? 0.0;
-    totalExpense += amt;
-    DateTime dt = DateTime.parse(tx['created_at']);
-    if (dt.isAfter(start) || dt.isAtSameMomentAs(start)) {
-      periodExpense += amt;
+  // 1. Chiqimlarni va Kirimlarni (Transactions) olish
+  // Qoida: Admin faqat o'zini chiqim/kirimini ko'radi (transactions jadvalidan).
+  // Hodim o'zinikini ko'radi.
+  if (requestedEmpId == null || !isAdmin || requestedEmpId == user.id) {
+    final txRes =
+        await supabase.from('transactions').select().eq('user_id', user.id);
+    for (var tx in txRes) {
+      double amt = (tx['amount'] as num?)?.toDouble() ?? 0.0;
+      bool isInc = tx['type'] == 'income';
+
+      if (isInc) {
+        totalIncome += amt;
+      } else {
+        totalExpense += amt;
+      }
+
+      DateTime dt = DateTime.parse(tx['created_at']);
+      if (dt.isAfter(start) || dt.isAtSameMomentAs(start)) {
+        if (isInc) {
+          periodIncome += amt;
+        } else {
+          periodExpense += amt;
+        }
+      }
     }
   }
 
-  // 2. Kirimlarni olish (confirmed salaries)
-  final salaryRes = await supabase
-      .from('salaries')
-      .select('amount_uzs, created_at, status')
-      .eq('user_id', empId);
+  // 2. Kirimlarni (Salaries) olish
+  // Qoida: Admin "Hammasi"da hamma confirmed oyliklarni ko'radi.
+  // Admin xodim tanlasa faqat o'sha xodimnikini ko'radi.
+  // Hodim faqat o'zinikini ko'radi.
+  var salQuery = supabase.from('salaries').select();
+  if (isAdmin) {
+    if (requestedEmpId != null) {
+      salQuery = salQuery.eq('user_id', requestedEmpId);
+    }
+    // "Hammasi" bo'lsa filter yo'q, hamma oyliklar keladi
+  } else {
+    salQuery = salQuery.eq('user_id', user.id);
+  }
+
+  final salaryRes = await salQuery;
   for (var s in salaryRes) {
     double amt = (s['amount_uzs'] as num?)?.toDouble() ?? 0.0;
     if (s['status'] == 'confirmed') {
@@ -128,6 +149,7 @@ final statsProvider =
         periodIncome += amt;
       }
     } else if (s['status'] == 'pending') {
+      // Hodim o'zi uchun kutilayotganlarni ko'radi, Admin hamma kutilayotganlarni
       pendingSum += amt;
     }
   }
@@ -158,7 +180,6 @@ final barChartDataProvider =
   final isAdmin = user.appMetadata['is_admin'] == true;
   final period = ref.watch(selectedPeriodProvider);
   final requestedEmpId = ref.watch(selectedEmployeeFilterProvider);
-  final empId = isAdmin ? (requestedEmpId ?? user.id) : user.id;
 
   DateTime now = DateTime.now();
   DateTime start;
@@ -174,18 +195,30 @@ final barChartDataProvider =
     start = DateTime(now.year, now.month, now.day);
   }
 
-  final txRes = await supabase
-      .from('transactions')
-      .select('amount, created_at')
-      .eq('user_id', empId)
-      .gte('created_at', start.toIso8601String());
+  // 1. Transactions (Adminniki yoki Hodimniki)
+  List<dynamic> txRes = [];
+  if (requestedEmpId == null || !isAdmin || requestedEmpId == user.id) {
+    txRes = await supabase
+        .from('transactions')
+        .select()
+        .eq('user_id', user.id)
+        .gte('created_at', start.toIso8601String());
+  }
 
-  final salaryRes = await supabase
+  // 2. Salaries (Admin uchun hamma/tanlangan, hodim uchun o'zi)
+  var salQuery = supabase
       .from('salaries')
-      .select('amount_uzs, created_at')
-      .eq('user_id', empId)
+      .select()
       .eq('status', 'confirmed')
       .gte('created_at', start.toIso8601String());
+  if (isAdmin) {
+    if (requestedEmpId != null) {
+      salQuery = salQuery.eq('user_id', requestedEmpId);
+    }
+  } else {
+    salQuery = salQuery.eq('user_id', user.id);
+  }
+  final salaryRes = await salQuery;
 
   List<DashboardChartData> data = [];
   if (period == 'Yil') {
@@ -211,8 +244,13 @@ final barChartDataProvider =
           inc += (s['amount_uzs'] as num?)?.toDouble() ?? 0;
       }
       for (var tx in txRes) {
-        if (DateTime.parse(tx['created_at']).month == i + 1)
-          exp += (tx['amount'] as num?)?.toDouble() ?? 0;
+        if (DateTime.parse(tx['created_at']).month == i + 1) {
+          double amt = (tx['amount'] as num?)?.toDouble() ?? 0;
+          if (tx['type'] == 'income')
+            inc += amt;
+          else
+            exp += amt;
+        }
       }
       data.add(DashboardChartData(inc, exp, labels[i]));
     }
@@ -226,7 +264,13 @@ final barChartDataProvider =
       }
       for (var tx in txRes) {
         int week = ((DateTime.parse(tx['created_at']).day - 1) / 7).floor() + 1;
-        if (week == i) exp += (tx['amount'] as num?)?.toDouble() ?? 0;
+        if (week == i) {
+          double amt = (tx['amount'] as num?)?.toDouble() ?? 0;
+          if (tx['type'] == 'income')
+            inc += amt;
+          else
+            exp += amt;
+        }
       }
       data.add(DashboardChartData(inc, exp, '$i-hafta'));
     }
@@ -243,8 +287,13 @@ final barChartDataProvider =
       }
       for (var tx in txRes) {
         DateTime td = DateTime.parse(tx['created_at']);
-        if (td.day == d.day && td.month == d.month)
-          exp += (tx['amount'] as num?)?.toDouble() ?? 0;
+        if (td.day == d.day && td.month == d.month) {
+          double amt = (tx['amount'] as num?)?.toDouble() ?? 0;
+          if (tx['type'] == 'income')
+            inc += amt;
+          else
+            exp += amt;
+        }
       }
       data.add(DashboardChartData(inc, exp, labels[i]));
     }
@@ -252,7 +301,13 @@ final barChartDataProvider =
     double inc = 0;
     double exp = 0;
     for (var s in salaryRes) inc += (s['amount_uzs'] as num?)?.toDouble() ?? 0;
-    for (var tx in txRes) exp += (tx['amount'] as num?)?.toDouble() ?? 0;
+    for (var tx in txRes) {
+      double amt = (tx['amount'] as num?)?.toDouble() ?? 0;
+      if (tx['type'] == 'income')
+        inc += amt;
+      else
+        exp += amt;
+    }
     data.add(DashboardChartData(inc, exp, 'Bugun'));
   }
 
@@ -310,25 +365,51 @@ final annualReportProvider =
 
   final isAdmin = user.appMetadata['is_admin'] == true;
   final requestedEmpId = ref.watch(selectedEmployeeFilterProvider);
-  final empId = isAdmin ? (requestedEmpId ?? user.id) : user.id;
 
-  final res = await supabase
-      .from('transactions')
+  // 1. Transactions (Adminniki yoki Hodimniki)
+  List<dynamic> txRes = [];
+  if (requestedEmpId == null || !isAdmin || requestedEmpId == user.id) {
+    txRes = await supabase
+        .from('transactions')
+        .select()
+        .eq('user_id', user.id)
+        .gte('created_at', '${DateTime.now().year}-01-01');
+  }
+
+  // 2. Salaries (Admin uchun hamma/tanlangan, hodim uchun o'zi)
+  var salQuery = supabase
+      .from('salaries')
       .select()
-      .eq('user_id', empId)
+      .eq('status', 'confirmed')
       .gte('created_at', '${DateTime.now().year}-01-01');
+  if (isAdmin) {
+    if (requestedEmpId != null) {
+      salQuery = salQuery.eq('user_id', requestedEmpId);
+    }
+  } else {
+    salQuery = salQuery.eq('user_id', user.id);
+  }
+  final salaryRes = await salQuery;
+
   List<Map<String, dynamic>> data =
       List.generate(12, (i) => {'month': i, 'income': 0.0, 'expense': 0.0});
-  for (var tx in res) {
+
+  for (var tx in txRes) {
     int m = DateTime.parse(tx['created_at']).month - 1;
+    double amt = (tx['amount'] as num?)?.toDouble() ?? 0;
     if (tx['type'] == 'income') {
-      data[m]['income'] = (data[m]['income'] as double) +
-          ((tx['amount'] as num?)?.toDouble() ?? 0);
+      data[m]['income'] = (data[m]['income'] as double) + amt;
     } else {
-      data[m]['expense'] = (data[m]['expense'] as double) +
-          ((tx['amount'] as num?)?.toDouble() ?? 0);
+      data[m]['expense'] = (data[m]['expense'] as double) + amt;
     }
   }
+
+  for (var s in salaryRes) {
+    int m = DateTime.parse(s['created_at']).month - 1;
+    double amt = (s['amount_uzs'] as num?)?.toDouble() ?? 0;
+    data[m]['income'] = (data[m]['income'] as double) + amt;
+  }
+
   return data;
 });
 
@@ -342,7 +423,6 @@ final recentTransactionsProvider =
 
   final isAdmin = user.appMetadata['is_admin'] == true;
   final requestedEmpId = ref.watch(selectedEmployeeFilterProvider);
-  final empId = isAdmin ? (requestedEmpId ?? user.id) : user.id;
   final period = ref.watch(selectedRecentPeriodProvider);
 
   final now = DateTime.now();
@@ -358,26 +438,40 @@ final recentTransactionsProvider =
     start = DateTime(now.year, now.month, 1);
   }
 
-  final txRes = await supabase
-      .from('transactions')
-      .select()
-      .eq('user_id', empId)
-      .gte('created_at', start.toIso8601String())
-      .order('created_at', ascending: false)
-      .limit(20);
+  // 1. Transactions (Adminniki yoki Hodimniki)
+  List<dynamic> txRes = [];
+  if (requestedEmpId == null || !isAdmin || requestedEmpId == user.id) {
+    txRes = await supabase
+        .from('transactions')
+        .select()
+        .eq('user_id', user.id)
+        .gte('created_at', start.toIso8601String())
+        .order('created_at', ascending: false)
+        .limit(20);
+  }
 
-  final salaryRes = await supabase
+  // 2. Salaries (Admin uchun hamma/tanlangan, hodim uchun o'zi)
+  var salQuery = supabase
       .from('salaries')
       .select()
-      .eq('user_id', empId)
       .eq('status', 'confirmed')
-      .gte('created_at', start.toIso8601String())
-      .order('created_at', ascending: false)
-      .limit(20);
+      .gte('created_at', start.toIso8601String());
+
+  if (isAdmin) {
+    if (requestedEmpId != null) {
+      salQuery = salQuery.eq('user_id', requestedEmpId);
+    }
+  } else {
+    salQuery = salQuery.eq('user_id', user.id);
+  }
+
+  final salaryRes =
+      await salQuery.order('created_at', ascending: false).limit(20);
 
   List<Map<String, dynamic>> all = [];
   for (var tx in txRes) {
-    all.add({...tx, 'type': 'expense'});
+    // BUG FIX: O'zining kirimlarini ham ko'rsin
+    all.add({...tx});
   }
   for (var s in salaryRes) {
     all.add({
@@ -405,7 +499,6 @@ final categoryStatsProvider =
 
   final isAdmin = user.appMetadata['is_admin'] == true;
   final requestedEmpId = ref.watch(selectedEmployeeFilterProvider);
-  final empId = isAdmin ? (requestedEmpId ?? user.id) : user.id;
   final period = ref.watch(selectedCategoryPeriodProvider);
 
   final now = DateTime.now();
@@ -421,11 +514,17 @@ final categoryStatsProvider =
     start = DateTime(now.year, now.month, 1);
   }
 
+  // Qoida: Admin faqat o'zini xarajatlarini ko'radi (Xarajat tarkibi diagrammasida)
+  // Hodim o'zinikini ko'radi.
+  if (requestedEmpId != null && isAdmin && requestedEmpId != user.id) {
+    return {}; // Boshqa xodimning xarajatlarini ko'rmaydi
+  }
+
   final txRes = await supabase
       .from('transactions')
       .select('category, amount')
-      .eq('user_id', empId)
-      .eq('type', 'expense') // Faqat xarajatlar variantiga binoan
+      .eq('user_id', user.id)
+      .eq('type', 'expense')
       .gte('created_at', start.toIso8601String());
 
   Map<String, double> stats = {};
