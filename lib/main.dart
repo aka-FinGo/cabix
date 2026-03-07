@@ -12,6 +12,8 @@ import 'shared/layout/main_wrapper.dart';
 import 'features/transactions/add_transaction_screen.dart';
 import 'package:cabix/features/notifications/notifications_screen.dart';
 import 'features/dashboard/reports_screen.dart';
+import 'features/dashboard/admin_settings_screen.dart';
+import 'features/dashboard/settings_page_wrapper.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -88,6 +90,10 @@ final GoRouter _router = GoRouter(
       path: '/notifications',
       builder: (context, state) => const NotificationsScreen(),
     ),
+    GoRoute(
+      path: '/admin-settings',
+      builder: (context, state) => const AdminSettingsScreen(),
+    ),
     StatefulShellRoute.indexedStack(
       builder: (context, state, navigationShell) {
         return MainWrapper(navigationShell: navigationShell);
@@ -113,8 +119,7 @@ final GoRouter _router = GoRouter(
         StatefulShellBranch(routes: [
           GoRoute(
               path: '/settings',
-              builder: (context, state) =>
-                  const Center(child: Text('Sozlamalar'))),
+              builder: (context, state) => const SettingsPageWrapper()),
         ]),
       ],
     ),

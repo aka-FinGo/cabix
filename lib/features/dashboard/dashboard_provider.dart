@@ -44,12 +44,22 @@ final userProfileProvider =
   ref.watch(dashboardRealtimeProvider); // Realtime triggerga ulanish
   final user = Supabase.instance.client.auth.currentUser;
   if (user == null) return {};
-  final res = await Supabase.instance.client
-      .from('profiles')
-      .select()
-      .eq('id', user.id)
-      .single();
-  return res;
+  try {
+    final res = await Supabase.instance.client
+        .from('profiles')
+        .select()
+        .eq('id', user.id)
+        .single();
+    return res;
+  } catch (e) {
+    // Agar 'permissions' ustuni hali yo'q bo'lsa, xatosiz qaytarish
+    final res = await Supabase.instance.client
+        .from('profiles')
+        .select('id, full_name, email') // permissions'siz select
+        .eq('id', user.id)
+        .single();
+    return {...res, 'permissions': {}};
+  }
 });
 
 // 3. XODIMLAR RO'YXATI (Faqat adminlar uchun)
@@ -78,6 +88,11 @@ final statsProvider =
   final period = ref.watch(selectedPeriodProvider);
   final requestedEmpId = ref.watch(selectedEmployeeFilterProvider);
 
+  // Huquqlarni olish
+  final profile = ref.watch(userProfileProvider).value;
+  final permissions = Map<String, dynamic>.from(profile?['permissions'] ?? {});
+  final canSeeExpenses = permissions['see_employee_expenses'] ?? false;
+
   double totalIncome = 0;
   double totalExpense = 0;
   double periodIncome = 0;
@@ -99,11 +114,27 @@ final statsProvider =
   }
 
   // 1. Chiqimlarni va Kirimlarni (Transactions) olish
-  // Qoida: Admin faqat o'zini chiqim/kirimini ko'radi (transactions jadvalidan).
-  // Hodim o'zinikini ko'radi.
-  if (requestedEmpId == null || !isAdmin || requestedEmpId == user.id) {
-    final txRes =
-        await supabase.from('transactions').select().eq('user_id', user.id);
+  bool fetchTransactions = false;
+  String? targetUserId;
+
+  if (!isAdmin) {
+    fetchTransactions = true;
+    targetUserId = user.id;
+  } else {
+    if (requestedEmpId == null || requestedEmpId == user.id) {
+      fetchTransactions = true;
+      targetUserId = user.id;
+    } else if (canSeeExpenses) {
+      fetchTransactions = true;
+      targetUserId = requestedEmpId;
+    }
+  }
+
+  if (fetchTransactions && targetUserId != null) {
+    final txRes = await supabase
+        .from('transactions')
+        .select()
+        .eq('user_id', targetUserId);
     for (var tx in txRes) {
       double amt = (tx['amount'] as num?)?.toDouble() ?? 0.0;
       bool isInc = tx['type'] == 'income';
@@ -126,15 +157,11 @@ final statsProvider =
   }
 
   // 2. Kirimlarni (Salaries) olish
-  // Qoida: Admin "Hammasi"da hamma confirmed oyliklarni ko'radi.
-  // Admin xodim tanlasa faqat o'sha xodimnikini ko'radi.
-  // Hodim faqat o'zinikini ko'radi.
   var salQuery = supabase.from('salaries').select();
   if (isAdmin) {
     if (requestedEmpId != null) {
       salQuery = salQuery.eq('user_id', requestedEmpId);
     }
-    // "Hammasi" bo'lsa filter yo'q, hamma oyliklar keladi
   } else {
     salQuery = salQuery.eq('user_id', user.id);
   }
@@ -149,7 +176,6 @@ final statsProvider =
         periodIncome += amt;
       }
     } else if (s['status'] == 'pending') {
-      // Hodim o'zi uchun kutilayotganlarni ko'radi, Admin hamma kutilayotganlarni
       pendingSum += amt;
     }
   }
@@ -181,6 +207,11 @@ final barChartDataProvider =
   final period = ref.watch(selectedPeriodProvider);
   final requestedEmpId = ref.watch(selectedEmployeeFilterProvider);
 
+  // Huquqlarni olish
+  final profile = ref.watch(userProfileProvider).value;
+  final permissions = Map<String, dynamic>.from(profile?['permissions'] ?? {});
+  final canSeeExpenses = permissions['see_employee_expenses'] ?? false;
+
   DateTime now = DateTime.now();
   DateTime start;
 
@@ -197,11 +228,27 @@ final barChartDataProvider =
 
   // 1. Transactions (Adminniki yoki Hodimniki)
   List<dynamic> txRes = [];
-  if (requestedEmpId == null || !isAdmin || requestedEmpId == user.id) {
+  bool fetchTransactions = false;
+  String? targetUserId;
+
+  if (!isAdmin) {
+    fetchTransactions = true;
+    targetUserId = user.id;
+  } else {
+    if (requestedEmpId == null || requestedEmpId == user.id) {
+      fetchTransactions = true;
+      targetUserId = user.id;
+    } else if (canSeeExpenses) {
+      fetchTransactions = true;
+      targetUserId = requestedEmpId;
+    }
+  }
+
+  if (fetchTransactions && targetUserId != null) {
     txRes = await supabase
         .from('transactions')
         .select()
-        .eq('user_id', user.id)
+        .eq('user_id', targetUserId)
         .gte('created_at', start.toIso8601String());
   }
 
@@ -366,13 +413,34 @@ final annualReportProvider =
   final isAdmin = user.appMetadata['is_admin'] == true;
   final requestedEmpId = ref.watch(selectedEmployeeFilterProvider);
 
+  // Huquqlarni olish
+  final profile = ref.watch(userProfileProvider).value;
+  final permissions = Map<String, dynamic>.from(profile?['permissions'] ?? {});
+  final canSeeExpenses = permissions['see_employee_expenses'] ?? false;
+
   // 1. Transactions (Adminniki yoki Hodimniki)
   List<dynamic> txRes = [];
-  if (requestedEmpId == null || !isAdmin || requestedEmpId == user.id) {
+  bool fetchTransactions = false;
+  String? targetUserId;
+
+  if (!isAdmin) {
+    fetchTransactions = true;
+    targetUserId = user.id;
+  } else {
+    if (requestedEmpId == null || requestedEmpId == user.id) {
+      fetchTransactions = true;
+      targetUserId = user.id;
+    } else if (canSeeExpenses) {
+      fetchTransactions = true;
+      targetUserId = requestedEmpId;
+    }
+  }
+
+  if (fetchTransactions && targetUserId != null) {
     txRes = await supabase
         .from('transactions')
         .select()
-        .eq('user_id', user.id)
+        .eq('user_id', targetUserId)
         .gte('created_at', '${DateTime.now().year}-01-01');
   }
 
@@ -425,6 +493,11 @@ final recentTransactionsProvider =
   final requestedEmpId = ref.watch(selectedEmployeeFilterProvider);
   final period = ref.watch(selectedRecentPeriodProvider);
 
+  // Huquqlarni olish
+  final profile = ref.watch(userProfileProvider).value;
+  final permissions = Map<String, dynamic>.from(profile?['permissions'] ?? {});
+  final canSeeExpenses = permissions['see_employee_expenses'] ?? false;
+
   final now = DateTime.now();
   DateTime start;
   if (period == 'Kun') {
@@ -440,11 +513,27 @@ final recentTransactionsProvider =
 
   // 1. Transactions (Adminniki yoki Hodimniki)
   List<dynamic> txRes = [];
-  if (requestedEmpId == null || !isAdmin || requestedEmpId == user.id) {
+  bool fetchTransactions = false;
+  String? targetUserId;
+
+  if (!isAdmin) {
+    fetchTransactions = true;
+    targetUserId = user.id;
+  } else {
+    if (requestedEmpId == null || requestedEmpId == user.id) {
+      fetchTransactions = true;
+      targetUserId = user.id;
+    } else if (canSeeExpenses) {
+      fetchTransactions = true;
+      targetUserId = requestedEmpId;
+    }
+  }
+
+  if (fetchTransactions && targetUserId != null) {
     txRes = await supabase
         .from('transactions')
         .select()
-        .eq('user_id', user.id)
+        .eq('user_id', targetUserId)
         .gte('created_at', start.toIso8601String())
         .order('created_at', ascending: false)
         .limit(20);
@@ -501,6 +590,11 @@ final categoryStatsProvider =
   final requestedEmpId = ref.watch(selectedEmployeeFilterProvider);
   final period = ref.watch(selectedCategoryPeriodProvider);
 
+  // Huquqlarni olish
+  final profile = ref.watch(userProfileProvider).value;
+  final permissions = Map<String, dynamic>.from(profile?['permissions'] ?? {});
+  final canSeeExpenses = permissions['see_employee_expenses'] ?? false;
+
   final now = DateTime.now();
   DateTime start;
   if (period == 'Kun') {
@@ -514,18 +608,33 @@ final categoryStatsProvider =
     start = DateTime(now.year, now.month, 1);
   }
 
-  // Qoida: Admin faqat o'zini xarajatlarini ko'radi (Xarajat tarkibi diagrammasida)
-  // Hodim o'zinikini ko'radi.
-  if (requestedEmpId != null && isAdmin && requestedEmpId != user.id) {
-    return {}; // Boshqa xodimning xarajatlarini ko'rmaydi
+  // Qoida: Admin faqat o'zi ko'radi (Xarajat tarkibi diagrammasida)
+  // AGAR canSeeExpenses bo'lsa xodimnikini ham ko'radi.
+  bool fetchTransactions = false;
+  String? targetUserId;
+
+  if (!isAdmin) {
+    fetchTransactions = true;
+    targetUserId = user.id;
+  } else {
+    if (requestedEmpId == null || requestedEmpId == user.id) {
+      fetchTransactions = true;
+      targetUserId = user.id;
+    } else if (canSeeExpenses) {
+      fetchTransactions = true;
+      targetUserId = requestedEmpId;
+    }
   }
 
-  final txRes = await supabase
-      .from('transactions')
-      .select('category, amount')
-      .eq('user_id', user.id)
-      .eq('type', 'expense')
-      .gte('created_at', start.toIso8601String());
+  List<dynamic> txRes = [];
+  if (fetchTransactions && targetUserId != null) {
+    txRes = await supabase
+        .from('transactions')
+        .select('category, amount')
+        .eq('user_id', targetUserId)
+        .eq('type', 'expense')
+        .gte('created_at', start.toIso8601String());
+  }
 
   Map<String, double> stats = {};
   for (var tx in txRes) {

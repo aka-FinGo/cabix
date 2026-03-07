@@ -75,6 +75,17 @@ class DashboardScreen extends ConsumerWidget {
                   _buildEmployeeFilter(ref, isDark),
                   const SizedBox(width: 20),
                   _buildTopFilters(ref),
+                  if (Supabase.instance.client.auth.currentUser
+                          ?.appMetadata['is_admin'] ==
+                      true) ...[
+                    const SizedBox(width: 20),
+                    IconButton(
+                      icon: Icon(Icons.admin_panel_settings_outlined,
+                          color: isDark ? Colors.white70 : Colors.black54),
+                      tooltip: "Admin huquqlari",
+                      onPressed: () => context.push('/admin-settings'),
+                    ),
+                  ],
                 ],
               ),
             ],
@@ -338,6 +349,7 @@ class DashboardScreen extends ConsumerWidget {
     final isGlass = theme == AppThemeMode.glass;
     final isDark = theme == AppThemeMode.dark || isGlass;
     final user = Supabase.instance.client.auth.currentUser;
+    final isAdmin = user?.appMetadata['is_admin'] == true;
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(20),
@@ -362,7 +374,17 @@ class DashboardScreen extends ConsumerWidget {
                           fontSize: 13)),
                 ],
               ),
-              _buildEmployeeFilter(ref, isDark, isMobile: true),
+              Row(
+                children: [
+                  if (isAdmin)
+                    IconButton(
+                      icon: Icon(Icons.admin_panel_settings_outlined,
+                          color: isDark ? Colors.white70 : Colors.black87),
+                      onPressed: () => context.push('/admin-settings'),
+                    ),
+                  _buildEmployeeFilter(ref, isDark, isMobile: true),
+                ],
+              ),
             ],
           ),
           const SizedBox(height: 32),
