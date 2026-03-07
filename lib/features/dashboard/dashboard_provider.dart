@@ -1,6 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:fl_chart/fl_chart.dart';
 
 // 0. REAL-TIME YANGILANISH TRIGGERI
 // Ushbu provider ma'lumotlar bazasidagi o'zgarishlarni eshitib turadi
@@ -31,7 +30,13 @@ final dashboardRealtimeProvider = StreamProvider.autoDispose<void>((ref) {
 
 // 1. FILTRLAR
 final selectedPeriodProvider = StateProvider<String>((ref) => 'Oy');
-final selectedEmployeeFilterProvider = StateProvider<String?>((ref) => null);
+final selectedRecentPeriodProvider = StateProvider<String>((ref) => 'Oy');
+final selectedCategoryPeriodProvider = StateProvider<String>((ref) => 'Oy');
+
+// Xodim filteri: faqat adminlar uchun. Oddiy user uchun hamisha null (o'zi).
+final selectedEmployeeFilterProvider = StateProvider<String?>((ref) {
+  return null; // Dastlab null
+});
 
 // 2. FOYDALANUVCHI PROFILI (AppBar uchun)
 final userProfileProvider =
@@ -47,9 +52,13 @@ final userProfileProvider =
   return res;
 });
 
-// 3. XODIMLAR RO'YXATI
+// 3. XODIMLAR RO'YXATI (Faqat adminlar uchun)
 final employeesProvider =
     FutureProvider.autoDispose<List<Map<String, dynamic>>>((ref) async {
+  final user = Supabase.instance.client.auth.currentUser;
+  final isAdmin = user?.appMetadata['is_admin'] == true;
+  if (!isAdmin) return [];
+
   final res = await Supabase.instance.client
       .from('profiles')
       .select('id, full_name')
@@ -60,94 +69,196 @@ final employeesProvider =
 // 4. STATISTIKA
 final statsProvider =
     FutureProvider.autoDispose<Map<String, double>>((ref) async {
-  ref.watch(dashboardRealtimeProvider); // Realtime triggerga ulanish
+  ref.watch(dashboardRealtimeProvider);
   final supabase = Supabase.instance.client;
-  final empId = ref.watch(selectedEmployeeFilterProvider) ??
-      supabase.auth.currentUser?.id;
-  double income = 0;
-  double expense = 0;
+  final user = supabase.auth.currentUser;
+  if (user == null) return {};
 
-  // 1. Chiqimlarni olish
-  final txRes = await supabase
-      .from('transactions')
-      .select('type, amount')
-      .eq('user_id', empId!);
-  for (var tx in txRes) {
-    expense += (tx['amount'] as num?)?.toDouble() ?? 0.0;
-  }
-
-  // 2. Kirimlarni olish (confirmed salaries)
-  final salaryRes = await supabase
-      .from('salaries')
-      .select('amount_uzs')
-      .eq('user_id', empId)
-      .eq('status', 'confirmed');
-  for (var s in salaryRes) {
-    income += (s['amount_uzs'] as num?)?.toDouble() ?? 0.0;
-  }
-
-  return {'balance': income - expense, 'income': income, 'expense': expense};
-});
-
-// 5. GRAFIK
-final chartSpotsProvider =
-    FutureProvider.autoDispose<List<FlSpot>>((ref) async {
-  ref.watch(dashboardRealtimeProvider); // Realtime triggerga ulanish
+  final isAdmin = user.appMetadata['is_admin'] == true;
   final period = ref.watch(selectedPeriodProvider);
-  final empId = ref.watch(selectedEmployeeFilterProvider) ??
-      Supabase.instance.client.auth.currentUser?.id;
-  final supabase = Supabase.instance.client;
-  DateTime now = DateTime.now();
+  // Agar admin bo'lsa filter ishlatadi, bo'lmasa faqat o'zini.
+  final requestedEmpId = ref.watch(selectedEmployeeFilterProvider);
+  final empId = isAdmin ? (requestedEmpId ?? user.id) : user.id;
+
+  double totalIncome = 0;
+  double totalExpense = 0;
+  double periodIncome = 0;
+  double periodExpense = 0;
+  double pendingSum = 0;
+
+  // Davr chegaralarini aniqlash
+  final now = DateTime.now();
   DateTime start;
   if (period == 'Kun') {
     start = DateTime(now.year, now.month, now.day);
   } else if (period == 'Hafta') {
-    start = now.subtract(const Duration(days: 7));
+    start = now.subtract(Duration(days: now.weekday - 1));
+    start = DateTime(start.year, start.month, start.day);
   } else if (period == 'Yil') {
     start = DateTime(now.year, 1, 1);
   } else {
     start = DateTime(now.year, now.month, 1);
   }
 
+  // 1. Chiqimlarni olish
   final txRes = await supabase
       .from('transactions')
       .select('amount, created_at')
-      .eq('user_id', empId!)
-      .gte('created_at', start.toIso8601String())
-      .order('created_at');
+      .eq('user_id', empId);
+  for (var tx in txRes) {
+    double amt = (tx['amount'] as num?)?.toDouble() ?? 0.0;
+    totalExpense += amt;
+    DateTime dt = DateTime.parse(tx['created_at']);
+    if (dt.isAfter(start) || dt.isAtSameMomentAs(start)) {
+      periodExpense += amt;
+    }
+  }
+
+  // 2. Kirimlarni olish (confirmed salaries)
+  final salaryRes = await supabase
+      .from('salaries')
+      .select('amount_uzs, created_at, status')
+      .eq('user_id', empId);
+  for (var s in salaryRes) {
+    double amt = (s['amount_uzs'] as num?)?.toDouble() ?? 0.0;
+    if (s['status'] == 'confirmed') {
+      totalIncome += amt;
+      DateTime dt = DateTime.parse(s['created_at']);
+      if (dt.isAfter(start) || dt.isAtSameMomentAs(start)) {
+        periodIncome += amt;
+      }
+    } else if (s['status'] == 'pending') {
+      pendingSum += amt;
+    }
+  }
+
+  return {
+    'total_balance': totalIncome - totalExpense,
+    'period_income': periodIncome,
+    'period_expense': periodExpense,
+    'pending_sum': pendingSum,
+  };
+});
+
+// 5. BAR CHART DATA PROVIDER
+class DashboardChartData {
+  final double income;
+  final double expense;
+  final String label;
+  DashboardChartData(this.income, this.expense, this.label);
+}
+
+final barChartDataProvider =
+    FutureProvider.autoDispose<List<DashboardChartData>>((ref) async {
+  ref.watch(dashboardRealtimeProvider);
+  final supabase = Supabase.instance.client;
+  final user = supabase.auth.currentUser;
+  if (user == null) return [];
+
+  final isAdmin = user.appMetadata['is_admin'] == true;
+  final period = ref.watch(selectedPeriodProvider);
+  final requestedEmpId = ref.watch(selectedEmployeeFilterProvider);
+  final empId = isAdmin ? (requestedEmpId ?? user.id) : user.id;
+
+  DateTime now = DateTime.now();
+  DateTime start;
+
+  if (period == 'Yil') {
+    start = DateTime(now.year, 1, 1);
+  } else if (period == 'Oy') {
+    start = DateTime(now.year, now.month, 1);
+  } else if (period == 'Hafta') {
+    start = now.subtract(Duration(days: now.weekday - 1));
+    start = DateTime(start.year, start.month, start.day);
+  } else {
+    start = DateTime(now.year, now.month, now.day);
+  }
+
+  final txRes = await supabase
+      .from('transactions')
+      .select('amount, created_at')
+      .eq('user_id', empId)
+      .gte('created_at', start.toIso8601String());
 
   final salaryRes = await supabase
       .from('salaries')
       .select('amount_uzs, created_at')
       .eq('user_id', empId)
       .eq('status', 'confirmed')
-      .gte('created_at', start.toIso8601String())
-      .order('created_at');
+      .gte('created_at', start.toIso8601String());
 
-  List<Map<String, dynamic>> all = [];
-  for (var tx in txRes) {
-    all.add({
-      'amount': (tx['amount'] as num).toDouble(),
-      'created_at': tx['created_at']
-    });
+  List<DashboardChartData> data = [];
+  if (period == 'Yil') {
+    final labels = [
+      'Yan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Iyun',
+      'Iyul',
+      'Avg',
+      'Sen',
+      'Okt',
+      'Noy',
+      'Dek'
+    ];
+    for (int i = 0; i < 12; i++) {
+      double inc = 0;
+      double exp = 0;
+      for (var s in salaryRes) {
+        if (DateTime.parse(s['created_at']).month == i + 1)
+          inc += (s['amount_uzs'] as num?)?.toDouble() ?? 0;
+      }
+      for (var tx in txRes) {
+        if (DateTime.parse(tx['created_at']).month == i + 1)
+          exp += (tx['amount'] as num?)?.toDouble() ?? 0;
+      }
+      data.add(DashboardChartData(inc, exp, labels[i]));
+    }
+  } else if (period == 'Oy') {
+    for (int i = 1; i <= 5; i++) {
+      double inc = 0;
+      double exp = 0;
+      for (var s in salaryRes) {
+        int week = ((DateTime.parse(s['created_at']).day - 1) / 7).floor() + 1;
+        if (week == i) inc += (s['amount_uzs'] as num?)?.toDouble() ?? 0;
+      }
+      for (var tx in txRes) {
+        int week = ((DateTime.parse(tx['created_at']).day - 1) / 7).floor() + 1;
+        if (week == i) exp += (tx['amount'] as num?)?.toDouble() ?? 0;
+      }
+      data.add(DashboardChartData(inc, exp, '$i-hafta'));
+    }
+  } else if (period == 'Hafta') {
+    final labels = ['Du', 'Se', 'Shor', 'Pay', 'Ju', 'Sha', 'Yak'];
+    for (int i = 0; i < 7; i++) {
+      double inc = 0;
+      double exp = 0;
+      DateTime d = start.add(Duration(days: i));
+      for (var s in salaryRes) {
+        DateTime sd = DateTime.parse(s['created_at']);
+        if (sd.day == d.day && sd.month == d.month)
+          inc += (s['amount_uzs'] as num?)?.toDouble() ?? 0;
+      }
+      for (var tx in txRes) {
+        DateTime td = DateTime.parse(tx['created_at']);
+        if (td.day == d.day && td.month == d.month)
+          exp += (tx['amount'] as num?)?.toDouble() ?? 0;
+      }
+      data.add(DashboardChartData(inc, exp, labels[i]));
+    }
+  } else {
+    double inc = 0;
+    double exp = 0;
+    for (var s in salaryRes) inc += (s['amount_uzs'] as num?)?.toDouble() ?? 0;
+    for (var tx in txRes) exp += (tx['amount'] as num?)?.toDouble() ?? 0;
+    data.add(DashboardChartData(inc, exp, 'Bugun'));
   }
-  for (var s in salaryRes) {
-    all.add({
-      'amount': (s['amount_uzs'] as num).toDouble(),
-      'created_at': s['created_at']
-    });
-  }
 
-  all.sort((a, b) => a['created_at'].compareTo(b['created_at']));
-
-  if (all.isEmpty) return [const FlSpot(0, 0)];
-  return List.generate(
-      all.length,
-      (i) =>
-          FlSpot(i.toDouble(), (all[i]['amount'] as num).toDouble() / 1000000));
+  return data;
 });
 
-// ─────────────────────────────────────────────────────────────────────────────
 // 6. PENDING NOTIFIKATSIYALAR
 //
 //  MANTIQ:
@@ -193,21 +304,29 @@ final pendingSalariesProvider =
 // 7. YILLIK HISOBOT
 final annualReportProvider =
     FutureProvider.autoDispose<List<Map<String, dynamic>>>((ref) async {
-  final empId = ref.watch(selectedEmployeeFilterProvider) ??
-      Supabase.instance.client.auth.currentUser?.id;
-  final res = await Supabase.instance.client
+  final supabase = Supabase.instance.client;
+  final user = supabase.auth.currentUser;
+  if (user == null) return [];
+
+  final isAdmin = user.appMetadata['is_admin'] == true;
+  final requestedEmpId = ref.watch(selectedEmployeeFilterProvider);
+  final empId = isAdmin ? (requestedEmpId ?? user.id) : user.id;
+
+  final res = await supabase
       .from('transactions')
       .select()
-      .eq('user_id', empId!)
+      .eq('user_id', empId)
       .gte('created_at', '${DateTime.now().year}-01-01');
   List<Map<String, dynamic>> data =
       List.generate(12, (i) => {'month': i, 'income': 0.0, 'expense': 0.0});
   for (var tx in res) {
     int m = DateTime.parse(tx['created_at']).month - 1;
     if (tx['type'] == 'income') {
-      data[m]['income'] += tx['amount'];
+      data[m]['income'] = (data[m]['income'] as double) +
+          ((tx['amount'] as num?)?.toDouble() ?? 0);
     } else {
-      data[m]['expense'] += tx['amount'];
+      data[m]['expense'] = (data[m]['expense'] as double) +
+          ((tx['amount'] as num?)?.toDouble() ?? 0);
     }
   }
   return data;
@@ -216,25 +335,45 @@ final annualReportProvider =
 // 8. OXIRGI AMALLAR
 final recentTransactionsProvider =
     FutureProvider.autoDispose<List<Map<String, dynamic>>>((ref) async {
-  ref.watch(dashboardRealtimeProvider); // Realtime triggerga ulanish
+  ref.watch(dashboardRealtimeProvider);
   final supabase = Supabase.instance.client;
-  final empId = ref.watch(selectedEmployeeFilterProvider) ??
-      supabase.auth.currentUser?.id;
+  final user = supabase.auth.currentUser;
+  if (user == null) return [];
+
+  final isAdmin = user.appMetadata['is_admin'] == true;
+  final requestedEmpId = ref.watch(selectedEmployeeFilterProvider);
+  final empId = isAdmin ? (requestedEmpId ?? user.id) : user.id;
+  final period = ref.watch(selectedRecentPeriodProvider);
+
+  final now = DateTime.now();
+  DateTime start;
+  if (period == 'Kun') {
+    start = DateTime(now.year, now.month, now.day);
+  } else if (period == 'Hafta') {
+    start = now.subtract(Duration(days: now.weekday - 1));
+    start = DateTime(start.year, start.month, start.day);
+  } else if (period == 'Yil') {
+    start = DateTime(now.year, 1, 1);
+  } else {
+    start = DateTime(now.year, now.month, 1);
+  }
 
   final txRes = await supabase
       .from('transactions')
       .select()
-      .eq('user_id', empId!)
+      .eq('user_id', empId)
+      .gte('created_at', start.toIso8601String())
       .order('created_at', ascending: false)
-      .limit(10);
+      .limit(20);
 
   final salaryRes = await supabase
       .from('salaries')
       .select()
       .eq('user_id', empId)
       .eq('status', 'confirmed')
+      .gte('created_at', start.toIso8601String())
       .order('created_at', ascending: false)
-      .limit(10);
+      .limit(20);
 
   List<Map<String, dynamic>> all = [];
   for (var tx in txRes) {
@@ -256,24 +395,43 @@ final recentTransactionsProvider =
   return all.take(10).toList();
 });
 
-// 9. KATEGORIYA STATISTIKASI (Pie Chart uchun)
+// 9. KATEGORIYA STATISTIKASI
 final categoryStatsProvider =
     FutureProvider.autoDispose<Map<String, double>>((ref) async {
   ref.watch(dashboardRealtimeProvider);
   final supabase = Supabase.instance.client;
-  final empId = ref.watch(selectedEmployeeFilterProvider) ??
-      supabase.auth.currentUser?.id;
+  final user = supabase.auth.currentUser;
+  if (user == null) return {};
 
-  // Xarajatlar kategoriyalari
+  final isAdmin = user.appMetadata['is_admin'] == true;
+  final requestedEmpId = ref.watch(selectedEmployeeFilterProvider);
+  final empId = isAdmin ? (requestedEmpId ?? user.id) : user.id;
+  final period = ref.watch(selectedCategoryPeriodProvider);
+
+  final now = DateTime.now();
+  DateTime start;
+  if (period == 'Kun') {
+    start = DateTime(now.year, now.month, now.day);
+  } else if (period == 'Hafta') {
+    start = now.subtract(Duration(days: now.weekday - 1));
+    start = DateTime(start.year, start.month, start.day);
+  } else if (period == 'Yil') {
+    start = DateTime(now.year, 1, 1);
+  } else {
+    start = DateTime(now.year, now.month, 1);
+  }
+
   final txRes = await supabase
       .from('transactions')
       .select('category, amount')
-      .eq('user_id', empId!);
+      .eq('user_id', empId)
+      .eq('type', 'expense') // Faqat xarajatlar variantiga binoan
+      .gte('created_at', start.toIso8601String());
 
   Map<String, double> stats = {};
   for (var tx in txRes) {
     final cat = tx['category'] ?? 'Boshqa';
-    stats[cat] = (stats[cat] ?? 0) + (tx['amount'] as num).toDouble();
+    stats[cat] = (stats[cat] ?? 0) + ((tx['amount'] as num?)?.toDouble() ?? 0);
   }
   return stats;
 });

@@ -26,17 +26,49 @@ class ThemeNotifier extends StateNotifier<AppThemeMode> {
   ThemeData getThemeData() {
     switch (state) {
       case AppThemeMode.dark:
-        return ThemeData.dark(useMaterial3: true).copyWith(
-          colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF2EAF9B), brightness: Brightness.dark),
+        return ThemeData(
+          useMaterial3: true,
+          brightness: Brightness.dark,
+          scaffoldBackgroundColor: const Color(0xFF0F0F12), // Deep black/grey
+          primaryColor: const Color(0xFF6366F1), // StoreShop Indigo
+          cardColor: const Color(0xFF1C1C21),
+          colorScheme: const ColorScheme.dark(
+            primary: Color(0xFF6366F1),
+            secondary: Color(0xFF2EAF9B),
+            surface: Color(0xFF1C1C21),
+            background: Color(0xFF0F0F12),
+          ),
+          textTheme: const TextTheme(
+            headlineLarge:
+                TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+            bodyMedium: TextStyle(color: Colors.white70),
+          ),
         );
       case AppThemeMode.glass:
-        return ThemeData.light(useMaterial3: true).copyWith(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-          scaffoldBackgroundColor: Colors.transparent, // Glass uchun orqa fon gradient bo'ladi
+        return ThemeData(
+          useMaterial3: true,
+          brightness: Brightness.dark,
+          scaffoldBackgroundColor: Colors.transparent,
+          primaryColor: Colors.white,
+          colorScheme: ColorScheme.fromSeed(
+            seedColor: Colors.deepPurple,
+            brightness: Brightness.dark,
+            primary: Colors.white,
+          ),
         );
       default:
-        return ThemeData.light(useMaterial3: true).copyWith(
-          colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF0F6659)),
+        return ThemeData(
+          useMaterial3: true,
+          brightness: Brightness.light,
+          scaffoldBackgroundColor: const Color(0xFFF8FAFC),
+          primaryColor: const Color(0xFF6366F1),
+          cardColor: Colors.white,
+          colorScheme: const ColorScheme.light(
+            primary: Color(0xFF6366F1),
+            secondary: Color(0xFF0F172A),
+            surface: Colors.white,
+            background: Color(0xFFF8FAFC),
+          ),
         );
     }
   }

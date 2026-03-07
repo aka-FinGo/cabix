@@ -11,10 +11,13 @@ import 'features/dashboard/dashboard_screen.dart';
 import 'shared/layout/main_wrapper.dart';
 import 'features/transactions/add_transaction_screen.dart';
 import 'package:cabix/features/notifications/notifications_screen.dart';
+import 'features/dashboard/reports_screen.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  if (AppConstants.supabaseUrl.isNotEmpty && AppConstants.supabaseAnonKey.isNotEmpty) {
+  if (AppConstants.supabaseUrl.isNotEmpty &&
+      AppConstants.supabaseAnonKey.isNotEmpty) {
     await Supabase.initialize(
       url: AppConstants.supabaseUrl,
       anonKey: AppConstants.supabaseAnonKey,
@@ -35,8 +38,8 @@ class GoRouterRefreshStream extends ChangeNotifier {
   GoRouterRefreshStream(Stream<dynamic> stream) {
     notifyListeners();
     _subscription = stream.asBroadcastStream().listen(
-      (dynamic _) => notifyListeners(),
-    );
+          (dynamic _) => notifyListeners(),
+        );
   }
   late final StreamSubscription<dynamic> _subscription;
   @override
@@ -50,10 +53,11 @@ class GoRouterRefreshStream extends ChangeNotifier {
 final GoRouter _router = GoRouter(
   navigatorKey: _rootNavigatorKey,
   initialLocation: '/dashboard',
-  
+
   // QO'SHILDI: Tizimdan chiqilganda yoki kirganda routerni avtomatik yangilash
-  refreshListenable: GoRouterRefreshStream(Supabase.instance.client.auth.onAuthStateChange),
-  
+  refreshListenable:
+      GoRouterRefreshStream(Supabase.instance.client.auth.onAuthStateChange),
+
   redirect: (context, state) {
     final session = Supabase.instance.client.auth.currentSession;
     final isGoingToLogin = state.matchedLocation == '/login';
@@ -91,18 +95,26 @@ final GoRouter _router = GoRouter(
       branches: [
         StatefulShellBranch(routes: [
           GoRoute(
-            path: '/dashboard', 
+            path: '/dashboard',
             builder: (context, state) => const DashboardScreen(),
           ),
         ]),
         StatefulShellBranch(routes: [
-          GoRoute(path: '/salaries', builder: (context, state) => const Center(child: Text('Ish haqi'))),
+          GoRoute(
+              path: '/salaries',
+              builder: (context, state) =>
+                  const Center(child: Text('Ish haqi'))),
         ]),
         StatefulShellBranch(routes: [
-          GoRoute(path: '/reports', builder: (context, state) => const Center(child: Text('Hisobotlar'))),
+          GoRoute(
+              path: '/reports',
+              builder: (context, state) => const ReportsScreen()),
         ]),
         StatefulShellBranch(routes: [
-          GoRoute(path: '/settings', builder: (context, state) => const Center(child: Text('Sozlamalar'))),
+          GoRoute(
+              path: '/settings',
+              builder: (context, state) =>
+                  const Center(child: Text('Sozlamalar'))),
         ]),
       ],
     ),
