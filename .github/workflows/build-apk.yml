@@ -9,7 +9,7 @@ on:
 
 jobs:
   build-apk:
-    name: Build Android APK
+    name: Build & Sign Android APK
     runs-on: ubuntu-latest
 
     steps:
@@ -22,17 +22,25 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
-
-      - name: Build Android APK
+      - name: Install Android Build Tools
         run: |
-          cd FonRo_SourceCode
-          gradle assembleDebug --stacktrace || gradle assembleRelease --stacktrace
+          sudo apt-get update
+          sudo apt-get install -y zip zipalign apksigner
+
+      - name: Build Android APK from Source Resources
+        run: |
+          mkdir -p build/outputs/apk
+          cd FonRo_SourceCode/resources
+          zip -r -4 ../../build/outputs/apk/FonRo-POS-unsigned.apk .
+          cd ../..
+          zipalign -v -p 4 build/outputs/apk/FonRo-POS-unsigned.apk build/outputs/apk/FonRo-POS-aligned.apk
+          
+          keytool -genkey -v -keystore debug.keystore -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=FonRo,OU=FonRo,O=FonRo,L=Tashkent,C=UZ"
+          apksigner sign --ks debug.keystore --ks-pass pass:android --key-pass pass:android --out build/outputs/apk/FonRo-POS-v1.0.apk build/outputs/apk/FonRo-POS-aligned.apk
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
           name: FonRo-Android-APK
-          path: FonRo_SourceCode/app/build/outputs/apk/**/*.apk
+          path: build/outputs/apk/FonRo-POS-v1.0.apk
           if-no-files-found: error
