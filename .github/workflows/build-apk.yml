@@ -25,14 +25,14 @@ jobs:
       - name: Install Android Build Tools
         run: |
           sudo apt-get update
-          sudo apt-get install -y zip zipalign apksigner
+          sudo apt-get install -y zipalign apksigner python3
 
-      - name: Build Android APK from Source Resources
+      - name: Rebrand & Package APK
         run: |
-          mkdir -p build/outputs/apk
-          cd FonRo_SourceCode/resources
-          zip -r -4 ../../build/outputs/apk/FonRo-POS-unsigned.apk .
-          cd ../..
+          python3 scripts/package_apk.py
+
+      - name: Align & Sign APK
+        run: |
           zipalign -v -p 4 build/outputs/apk/FonRo-POS-unsigned.apk build/outputs/apk/FonRo-POS-aligned.apk
           
           keytool -genkey -v -keystore debug.keystore -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=FonRo,OU=FonRo,O=FonRo,L=Tashkent,C=UZ"
