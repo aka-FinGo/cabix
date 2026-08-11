@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="uz" data-theme="blue">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0A1429">
+    <meta name="color-scheme" content="dark">
+    <title>FonRo — FonRo Kassa</title>
+    <meta name="description" content="FonRo POS — do'kon kassasi va ombor boshqaruvi">
+    <link rel="stylesheet" href="css/style.css?v=1.0.2">
+</head>
+<body>
+<div id="app">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar-nav">
+        <div class="brand-header">
+            <div>
+                <div class="brand-title" id="brand-name">FonRo</div>
+                <div class="brand-sub" id="brand-owner">Adkham — egasi</div>
+            </div>
+        </div>
+        <div class="nav-group" id="nav-group">
+            <!-- Nav items injected by App.renderNav() -->
+        </div>
+    </aside>
+
+    <!-- Main -->
+    <div class="main-wrapper">
+        <header class="top-header">
+            <div class="top-left">
+                <div class="online-badge" id="online-badge">onlayn</div>
+            </div>
+            <div class="top-right">
+                <div class="time-display">
+                    <div class="time-clock" id="live-clock"></div>
+                    <div style="font-size:11px;color:var(--text-secondary)" id="live-date"></div>
+                </div>
+                <button class="header-icon-btn" title="Bildirishnomalar">🔔</button>
+                <button class="header-icon-btn" onclick="location.reload()" title="Yangilash">⟳</button>
+                <button class="header-icon-btn" title="Chiqish" id="btn-logout">⎋</button>
+            </div>
+        </header>
+
+        <div class="content-body" id="view">
+            <!-- Screens rendered dynamically by App -->
+        </div>
+    </div>
+</div>
+
+<!-- System overlays -->
+<div id="modal-root"></div>
+<div id="numpad-root"></div>
+<div id="toast-root" class="toast-root"></div>
+<div id="print-area"></div>
+
+<!-- Scripts -->
+<script src="js/core.js?v=1.0.2"></script>
+<script src="js/db.js?v=1.0.2"></script>
+<script src="js/screens-sale.js?v=1.0.2"></script>
+<script src="js/screens-catalog.js?v=1.0.2"></script>
+<script src="js/screens-docs.js?v=1.0.2"></script>
+<script src="js/screens-money.js?v=1.0.2"></script>
+<script src="js/screens-team.js?v=1.0.2"></script>
+<script src="js/screens-stats.js?v=1.0.2"></script>
+<script src="js/screens-orders.js?v=1.0.2"></script>
+<script src="js/screens-settings.js?v=1.0.2"></script>
+<script src="js/app.js?v=1.0.2"></script>
+</body>
+</html>
