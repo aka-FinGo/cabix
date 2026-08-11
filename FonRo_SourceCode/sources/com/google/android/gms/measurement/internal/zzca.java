@@ -1,0 +1,18 @@
+package com.google.android.gms.measurement.internal;
+
+import com.google.android.gms.internal.measurement.zzags;
+
+/* compiled from: com.google.android.gms:play-services-measurement-impl@@23.2.0 */
+/* loaded from: classes5.dex */
+final /* synthetic */ class zzca implements zzbo {
+    static final /* synthetic */ zzca zza = new zzca();
+
+    private /* synthetic */ zzca() {
+    }
+
+    @Override // com.google.android.gms.measurement.internal.zzbo
+    public final /* synthetic */ Object zza() {
+        zzfx zzfxVar = zzfy.zza;
+        return zzags.zzaw();
+    }
+}

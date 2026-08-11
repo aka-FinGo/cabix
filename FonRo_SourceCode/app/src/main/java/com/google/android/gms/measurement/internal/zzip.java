@@ -1,0 +1,31 @@
+package com.google.android.gms.measurement.internal;
+
+import com.google.android.gms.common.internal.Preconditions;
+import java.util.Objects;
+
+/* compiled from: com.google.android.gms:play-services-measurement@@23.2.0 */
+/* loaded from: classes5.dex */
+final class zzip implements Runnable {
+    final /* synthetic */ zzr zza;
+    final /* synthetic */ zzjd zzb;
+
+    /* JADX INFO: Access modifiers changed from: package-private */
+    public zzip(zzjd zzjdVar, zzr zzrVar) {
+        this.zza = zzrVar;
+        Objects.requireNonNull(zzjdVar);
+        this.zzb = zzjdVar;
+    }
+
+    @Override // java.lang.Runnable
+    public final void run() {
+        zzjd zzjdVar = this.zzb;
+        zzjdVar.zzL().zzaa();
+        zzpg zzL = zzjdVar.zzL();
+        zzL.zzaX().zzg();
+        zzL.zzu();
+        zzr zzrVar = this.zza;
+        Preconditions.checkNotEmpty(zzrVar.zza);
+        zzL.zzv(zzrVar);
+        zzL.zzw(zzrVar);
+    }
+}

@@ -1,0 +1,10 @@
+package com.google.android.gms.measurement.internal;
+
+import android.os.IInterface;
+import android.os.RemoteException;
+
+/* compiled from: com.google.android.gms:play-services-measurement-impl@@23.2.0 */
+/* loaded from: classes5.dex */
+public interface zzgh extends IInterface {
+    void zze(zzoq zzoqVar) throws RemoteException;
+}

@@ -1,0 +1,33 @@
+package com.google.android.gms.measurement.internal;
+
+import java.util.Objects;
+
+/* compiled from: com.google.android.gms:play-services-measurement@@23.2.0 */
+/* loaded from: classes5.dex */
+final class zziu implements Runnable {
+    final /* synthetic */ zzpl zza;
+    final /* synthetic */ zzr zzb;
+    final /* synthetic */ zzjd zzc;
+
+    /* JADX INFO: Access modifiers changed from: package-private */
+    public zziu(zzjd zzjdVar, zzpl zzplVar, zzr zzrVar) {
+        this.zza = zzplVar;
+        this.zzb = zzrVar;
+        Objects.requireNonNull(zzjdVar);
+        this.zzc = zzjdVar;
+    }
+
+    @Override // java.lang.Runnable
+    public final void run() {
+        zzjd zzjdVar = this.zzc;
+        zzjdVar.zzL().zzaa();
+        zzpl zzplVar = this.zza;
+        Object zza = zzplVar.zza();
+        zzr zzrVar = this.zzb;
+        if (zza != null) {
+            zzjdVar.zzL().zzad(zzplVar, zzrVar);
+        } else {
+            zzjdVar.zzL().zzae(zzplVar.zzb, zzrVar);
+        }
+    }
+}

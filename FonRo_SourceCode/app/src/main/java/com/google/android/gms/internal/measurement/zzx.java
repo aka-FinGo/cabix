@@ -1,0 +1,21 @@
+package com.google.android.gms.internal.measurement;
+
+import androidx.camera.video.AudioStats;
+import java.util.List;
+import java.util.Objects;
+
+/* compiled from: com.google.android.gms:play-services-measurement@@23.2.0 */
+/* loaded from: classes5.dex */
+final class zzx extends zzai {
+    /* JADX INFO: Access modifiers changed from: package-private */
+    /* JADX WARN: 'super' call moved to the top of the method (can break code semantics) */
+    public zzx(zzy zzyVar, String str) {
+        super("getVersion");
+        Objects.requireNonNull(zzyVar);
+    }
+
+    @Override // com.google.android.gms.internal.measurement.zzai
+    public final zzao zza(zzg zzgVar, List list) {
+        return new zzah(Double.valueOf(AudioStats.AUDIO_AMPLITUDE_NONE));
+    }
+}

@@ -1,0 +1,21 @@
+package com.google.android.gms.internal.measurement;
+
+import com.google.android.gms.common.api.internal.ListenerHolder;
+import java.util.Objects;
+
+/* compiled from: com.google.android.gms:play-services-measurement-impl@@23.2.0 */
+/* loaded from: classes5.dex */
+final class zzka extends zzkn {
+    final /* synthetic */ ListenerHolder zza;
+
+    /* JADX INFO: Access modifiers changed from: package-private */
+    public zzka(zzkk zzkkVar, ListenerHolder listenerHolder) {
+        this.zza = listenerHolder;
+        Objects.requireNonNull(zzkkVar);
+    }
+
+    @Override // com.google.android.gms.internal.measurement.zzko
+    public final void zzb(byte[] bArr) {
+        this.zza.notifyListener(new zzjz(this, bArr));
+    }
+}

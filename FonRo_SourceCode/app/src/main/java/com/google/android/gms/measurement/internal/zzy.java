@@ -1,0 +1,169 @@
+package com.google.android.gms.measurement.internal;
+
+import androidx.collection.ArrayMap;
+import com.google.android.gms.internal.measurement.zzahn;
+import java.util.ArrayList;
+import java.util.BitSet;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+
+/* JADX INFO: Access modifiers changed from: package-private */
+/* compiled from: com.google.android.gms:play-services-measurement@@23.2.0 */
+/* loaded from: classes5.dex */
+public final class zzy {
+    final /* synthetic */ zzad zza;
+    private String zzb;
+    private boolean zzc;
+    private com.google.android.gms.internal.measurement.zzii zzd;
+    private BitSet zze;
+    private BitSet zzf;
+    private Map zzg;
+    private Map zzh;
+
+    /* JADX INFO: Access modifiers changed from: package-private */
+    public /* synthetic */ zzy(zzad zzadVar, String str, com.google.android.gms.internal.measurement.zzii zziiVar, BitSet bitSet, BitSet bitSet2, Map map, Map map2, byte[] bArr) {
+        Objects.requireNonNull(zzadVar);
+        this.zza = zzadVar;
+        this.zzb = str;
+        this.zze = bitSet;
+        this.zzf = bitSet2;
+        this.zzg = map;
+        this.zzh = new ArrayMap();
+        for (Integer num : map2.keySet()) {
+            ArrayList arrayList = new ArrayList();
+            arrayList.add((Long) map2.get(num));
+            this.zzh.put(num, arrayList);
+        }
+        this.zzc = false;
+        this.zzd = zziiVar;
+    }
+
+    /* JADX INFO: Access modifiers changed from: package-private */
+    public final void zza(zzab zzabVar) {
+        int zza = zzabVar.zza();
+        Boolean bool = zzabVar.zzd;
+        if (bool != null) {
+            BitSet bitSet = this.zzf;
+            bool.booleanValue();
+            bitSet.set(zza, true);
+        }
+        Boolean bool2 = zzabVar.zze;
+        if (bool2 != null) {
+            this.zze.set(zza, bool2.booleanValue());
+        }
+        if (zzabVar.zzf != null) {
+            Map map = this.zzg;
+            Integer valueOf = Integer.valueOf(zza);
+            Long l = (Long) map.get(valueOf);
+            long longValue = zzabVar.zzf.longValue() / 1000;
+            if (l == null || longValue > l.longValue()) {
+                this.zzg.put(valueOf, Long.valueOf(longValue));
+            }
+        }
+        if (zzabVar.zzg != null) {
+            Map map2 = this.zzh;
+            Integer valueOf2 = Integer.valueOf(zza);
+            List list = (List) map2.get(valueOf2);
+            if (list == null) {
+                list = new ArrayList();
+                this.zzh.put(valueOf2, list);
+            }
+            if (zzabVar.zzb()) {
+                list.clear();
+            }
+            zzahn.zza();
+            zzic zzicVar = this.zza.zzu;
+            zzal zzc = zzicVar.zzc();
+            String str = this.zzb;
+            zzfx zzfxVar = zzfy.zzaF;
+            if (zzc.zzp(str, zzfxVar) && zzabVar.zzc()) {
+                list.clear();
+            }
+            zzahn.zza();
+            if (zzicVar.zzc().zzp(this.zzb, zzfxVar)) {
+                Long valueOf3 = Long.valueOf(zzabVar.zzg.longValue() / 1000);
+                if (list.contains(valueOf3)) {
+                    return;
+                }
+                list.add(valueOf3);
+                return;
+            }
+            list.add(Long.valueOf(zzabVar.zzg.longValue() / 1000));
+        }
+    }
+
+    /* JADX INFO: Access modifiers changed from: package-private */
+    public final com.google.android.gms.internal.measurement.zzhg zzb(int i) {
+        ArrayList arrayList;
+        List list;
+        com.google.android.gms.internal.measurement.zzhf zzi = com.google.android.gms.internal.measurement.zzhg.zzi();
+        zzi.zza(i);
+        zzi.zzd(this.zzc);
+        com.google.android.gms.internal.measurement.zzii zziiVar = this.zzd;
+        if (zziiVar != null) {
+            zzi.zzc(zziiVar);
+        }
+        com.google.android.gms.internal.measurement.zzih zzj = com.google.android.gms.internal.measurement.zzii.zzj();
+        zzj.zzc(zzpk.zzp(this.zze));
+        zzj.zza(zzpk.zzp(this.zzf));
+        Map map = this.zzg;
+        if (map == null) {
+            arrayList = null;
+        } else {
+            ArrayList arrayList2 = new ArrayList(map.size());
+            for (Integer num : this.zzg.keySet()) {
+                int intValue = num.intValue();
+                Long l = (Long) this.zzg.get(num);
+                if (l != null) {
+                    com.google.android.gms.internal.measurement.zzhp zze = com.google.android.gms.internal.measurement.zzhq.zze();
+                    zze.zza(intValue);
+                    zze.zzb(l.longValue());
+                    arrayList2.add((com.google.android.gms.internal.measurement.zzhq) zze.zzbd());
+                }
+            }
+            arrayList = arrayList2;
+        }
+        if (arrayList != null) {
+            zzj.zze(arrayList);
+        }
+        Map map2 = this.zzh;
+        if (map2 == null) {
+            list = Collections.EMPTY_LIST;
+        } else {
+            ArrayList arrayList3 = new ArrayList(map2.size());
+            for (Integer num2 : this.zzh.keySet()) {
+                com.google.android.gms.internal.measurement.zzij zzf = com.google.android.gms.internal.measurement.zzik.zzf();
+                zzf.zza(num2.intValue());
+                List list2 = (List) this.zzh.get(num2);
+                if (list2 != null) {
+                    Collections.sort(list2);
+                    zzf.zzb(list2);
+                }
+                arrayList3.add((com.google.android.gms.internal.measurement.zzik) zzf.zzbd());
+            }
+            list = arrayList3;
+        }
+        zzj.zzg(list);
+        zzi.zzb(zzj);
+        return (com.google.android.gms.internal.measurement.zzhg) zzi.zzbd();
+    }
+
+    /* JADX INFO: Access modifiers changed from: package-private */
+    public final /* synthetic */ BitSet zzc() {
+        return this.zze;
+    }
+
+    /* JADX INFO: Access modifiers changed from: package-private */
+    public /* synthetic */ zzy(zzad zzadVar, String str, byte[] bArr) {
+        Objects.requireNonNull(zzadVar);
+        this.zza = zzadVar;
+        this.zzb = str;
+        this.zzc = true;
+        this.zze = new BitSet();
+        this.zzf = new BitSet();
+        this.zzg = new ArrayMap();
+        this.zzh = new ArrayMap();
+    }
+}

@@ -1,0 +1,103 @@
+package com.google.android.gms.measurement.internal;
+
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.app.job.JobInfo;
+import android.app.job.JobScheduler;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.os.PersistableBundle;
+import androidx.core.app.NotificationCompat;
+
+/* compiled from: com.google.android.gms:play-services-measurement@@23.2.0 */
+/* loaded from: classes5.dex */
+public final class zzok extends zzos {
+    private final AlarmManager zza;
+    private zzaz zzb;
+    private Integer zzc;
+
+    /* JADX INFO: Access modifiers changed from: protected */
+    public zzok(zzpg zzpgVar) {
+        super(zzpgVar);
+        this.zza = (AlarmManager) this.zzu.zzaZ().getSystemService(NotificationCompat.CATEGORY_ALARM);
+    }
+
+    private final void zzh() {
+        JobScheduler jobScheduler = (JobScheduler) this.zzu.zzaZ().getSystemService("jobscheduler");
+        if (jobScheduler != null) {
+            jobScheduler.cancel(zzi());
+        }
+    }
+
+    private final int zzi() {
+        Integer num = this.zzc;
+        if (num == null) {
+            String packageName = this.zzu.zzaZ().getPackageName();
+            String.valueOf(packageName);
+            num = Integer.valueOf("measurement".concat(String.valueOf(packageName)).hashCode());
+            this.zzc = num;
+        }
+        return num.intValue();
+    }
+
+    private final PendingIntent zzj() {
+        Context zzaZ = this.zzu.zzaZ();
+        return com.google.android.gms.internal.measurement.zzce.zza(zzaZ, 0, new Intent().setClassName(zzaZ, "com.google.android.gms.measurement.AppMeasurementReceiver").setAction("com.google.android.gms.measurement.UPLOAD"), com.google.android.gms.internal.measurement.zzce.zza);
+    }
+
+    @Override // com.google.android.gms.measurement.internal.zzos
+    protected final boolean zzbc() {
+        AlarmManager alarmManager = this.zza;
+        if (alarmManager != null) {
+            alarmManager.cancel(zzj());
+        }
+        zzh();
+        return false;
+    }
+
+    protected final zzaz zzc() {
+        if (this.zzb == null) {
+            this.zzb = new zzoj(this, this.zzg.zzah());
+        }
+        return this.zzb;
+    }
+
+    public final void zzd(long j) {
+        zzay();
+        zzic zzicVar = this.zzu;
+        zzicVar.zzaV();
+        Context zzaZ = zzicVar.zzaZ();
+        if (!zzpp.zzax(zzaZ)) {
+            zzicVar.zzaW().zzj().zza("Receiver not registered/enabled");
+        }
+        if (!zzpp.zzS(zzaZ, false)) {
+            zzicVar.zzaW().zzj().zza("Service not registered/enabled");
+        }
+        zzf();
+        zzicVar.zzaW().zzk().zzb("Scheduling upload, millis", Long.valueOf(j));
+        zzicVar.zzba().elapsedRealtime();
+        zzicVar.zzc();
+        if (j < Math.max(0L, ((Long) zzfy.zzL.zzb(null)).longValue()) && !zzc().zzc()) {
+            zzc().zzb(j);
+        }
+        zzicVar.zzaV();
+        Context zzaZ2 = zzicVar.zzaZ();
+        ComponentName componentName = new ComponentName(zzaZ2, "com.google.android.gms.measurement.AppMeasurementJobService");
+        int zzi = zzi();
+        PersistableBundle persistableBundle = new PersistableBundle();
+        persistableBundle.putString("action", "com.google.android.gms.measurement.UPLOAD");
+        com.google.android.gms.internal.measurement.zzcf.zza(zzaZ2, new JobInfo.Builder(zzi, componentName).setMinimumLatency(j).setOverrideDeadline(j + j).setExtras(persistableBundle).build(), "com.google.android.gms", "UploadAlarm");
+    }
+
+    public final void zzf() {
+        zzay();
+        this.zzu.zzaW().zzk().zza("Unscheduling upload");
+        AlarmManager alarmManager = this.zza;
+        if (alarmManager != null) {
+            alarmManager.cancel(zzj());
+        }
+        zzc().zzd();
+        zzh();
+    }
+}

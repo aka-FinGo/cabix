@@ -1,0 +1,11 @@
+package com.google.android.gms.internal.measurement;
+
+import java.io.InputStream;
+
+/* compiled from: com.google.android.gms:play-services-measurement-base@@23.2.0 */
+/* loaded from: classes5.dex */
+public interface zzafj {
+    Object zza(InputStream inputStream, zzadf zzadfVar) throws zzaeh;
+
+    Object zzb(zzacv zzacvVar, zzadf zzadfVar) throws zzaeh;
+}

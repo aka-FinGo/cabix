@@ -1,0 +1,28 @@
+package com.google.android.gms.internal.mlkit_vision_barcode;
+
+/* compiled from: com.google.android.gms:play-services-mlkit-barcode-scanning@@18.3.1 */
+/* loaded from: classes5.dex */
+public final class zzxa {
+    private static zzwz zza;
+
+    public static synchronized zzwp zza(zzwh zzwhVar) {
+        zzwp zzwpVar;
+        synchronized (zzxa.class) {
+            zzwz zzwzVar = zza;
+            if (zzwzVar == null) {
+                zzwzVar = new zzwz(null);
+                zza = zzwzVar;
+            }
+            zzwpVar = (zzwp) zzwzVar.get(zzwhVar);
+        }
+        return zzwpVar;
+    }
+
+    public static synchronized zzwp zzb(String str) {
+        zzwp zza2;
+        synchronized (zzxa.class) {
+            zza2 = zza(zzwh.zzd(str).zzd());
+        }
+        return zza2;
+    }
+}

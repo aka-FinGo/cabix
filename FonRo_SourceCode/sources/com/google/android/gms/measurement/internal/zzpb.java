@@ -1,0 +1,32 @@
+package com.google.android.gms.measurement.internal;
+
+import android.os.Bundle;
+import android.text.TextUtils;
+import java.util.Objects;
+
+/* JADX INFO: Access modifiers changed from: package-private */
+/* compiled from: com.google.android.gms:play-services-measurement@@23.2.0 */
+/* loaded from: classes5.dex */
+public final class zzpb implements zzpo {
+    final /* synthetic */ zzpg zza;
+
+    /* JADX INFO: Access modifiers changed from: package-private */
+    public zzpb(zzpg zzpgVar) {
+        Objects.requireNonNull(zzpgVar);
+        this.zza = zzpgVar;
+    }
+
+    @Override // com.google.android.gms.measurement.internal.zzpo
+    public final void zza(String str, String str2, Bundle bundle) {
+        boolean isEmpty = TextUtils.isEmpty(str);
+        zzpg zzpgVar = this.zza;
+        if (isEmpty) {
+            if (zzpgVar.zzay() != null) {
+                zzpgVar.zzay().zzaW().zzb().zzb("AppId not known when logging event", str2);
+                return;
+            }
+            return;
+        }
+        zzpgVar.zzaX().zzj(new zzpa(this, str, str2, bundle));
+    }
+}

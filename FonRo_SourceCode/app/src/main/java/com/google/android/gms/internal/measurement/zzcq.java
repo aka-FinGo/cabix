@@ -1,0 +1,22 @@
+package com.google.android.gms.internal.measurement;
+
+import android.os.Bundle;
+import android.os.IBinder;
+import android.os.Parcel;
+import android.os.RemoteException;
+
+/* compiled from: com.google.android.gms:play-services-measurement-base@@23.2.0 */
+/* loaded from: classes5.dex */
+public final class zzcq extends zzbl implements zzcs {
+    /* JADX INFO: Access modifiers changed from: package-private */
+    public zzcq(IBinder iBinder) {
+        super(iBinder, "com.google.android.gms.measurement.api.internal.IBundleReceiver");
+    }
+
+    @Override // com.google.android.gms.internal.measurement.zzcs
+    public final void zzb(Bundle bundle) throws RemoteException {
+        Parcel zza = zza();
+        zzbn.zzc(zza, bundle);
+        zzc(1, zza);
+    }
+}

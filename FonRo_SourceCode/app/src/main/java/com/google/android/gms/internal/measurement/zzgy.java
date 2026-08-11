@@ -1,0 +1,12 @@
+package com.google.android.gms.internal.measurement;
+
+/* compiled from: com.google.android.gms:play-services-measurement-impl@@23.2.0 */
+/* loaded from: classes5.dex */
+final class zzgy {
+    static final zzaev zza;
+
+    static {
+        zzagm zzagmVar = zzagm.STRING;
+        zza = zzaev.zza(zzagmVar, "", zzagmVar, "");
+    }
+}

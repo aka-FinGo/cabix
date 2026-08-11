@@ -1,0 +1,1223 @@
+﻿ · «%s»: владелец + 	 · "%s": owner + 
+ · Карта: %s	 · Card: %s
+ · Наличные: %s · Карта: %s	 · Cash: %s · Card: %s
+ · Принял: %s	 · Received by: %s
+ · Пропущено (уже есть): %s	 · Skipped (already exists): %s
+ · до 	 · until 
+ · закуп 	 · cost 
+ · закуп %s	 · cost %s
+ · обычный	 · regular
+ · продано %s %s	 · sold %s %s
+ · скидка %s	 · discount %s
+ Проведите приход на странице «Приход».	 Record a stock-in on the "Stock-in" page.
+ Продажа в минус запрещена — уменьшите количество.	 Selling below zero stock is not allowed — reduce the quantity.
+ за период	 for the period
+ из 	 of 
+ итог в шапке посчитан по всем.	 the total in the header is calculated across all of them.
+ останутся на складе — просто без категории в списке.	 will stay in stock — just without a category in the list.
+ — количество	 — quantity
+ — сколько вернуть	 — how many to return
+ — списать (макс. 	 — write off (max. 
+ — фактический остаток	 — actual stock
+ → стало: 	 → now: 
+%s · %s л.	%s · %s sheets
+%s · Наличные: %s	%s · Cash: %s
+%s мм	%s mm
+%s поз.	%s items
+%s поз. · отложен %s	%s items · deferred %s
+%s чек. · средний %s	%s receipts · average %s
+%s шт	%s pcs
+%s — количество	%s — quantity
+%s: %s Печатаем через системный диалог.	%s: %s Printing via the system dialog.
++ Добавить товар	+ Add item
++%s · %s поз.	+%s · %s items
+1. Включите принтер и зажмите кнопку подачи, если он просит режим сопряжения.\n2. Откройте настройки Bluetooth и сопрягите устройство — код обычно 0000 или 1234.\n3. Вернитесь сюда и выберите его в списке.\n\nЕсли принтер не отвечает, чек всё равно не пропадёт: он уйдёт в системный диалог печати Android.	1. Turn on the printer and hold the feed button if it asks for pairing mode.\n2. Open Bluetooth settings and pair the device — the code is usually 0000 or 1234.\n3. Come back here and pick it from the list.\n\nIf the printer does not respond, the receipt will not be lost: it will go to the Android system print dialog.
+10 дней	10 days
+58 мм	58 mm
+6-значный код	6-digit code
+72 мм	72 mm
+80 мм	80 mm
+Bluetooth выключен	Bluetooth is off
+Bluetooth-принтер	Bluetooth printer
+FonRo · Новый заказ	FonRo · New order
+FonRo · Поддержка	FonRo · Support
+FonRo Премиум активен	FonRo Premium is active
+sale.title	sale.title
+«%s» будет скрыт из продажи. Остаток и история сохранятся.	"%s" will be hidden from sale. Stock and history will be kept.
+«%s» исчезнет из фильтров. 	"%s" will disappear from filters. 
+«%s» исчезнет из фильтров. Товары останутся на складе.	"%s" will disappear from filters. Items will stay in stock.
+«%s» на %s будет отменён.	"%s" for %s will be cancelled.
+«%s» сразу потеряет доступ. 	"%s" will lose access immediately. 
+«%s» сразу потеряет доступ. Слот ключа освободится.	"%s" will lose access immediately. The key slot will be freed.
+«%s» уже в документе	"%s" is already in the document
+«%s»: в чеке %s, на складе %s.	"%s": %s in the receipt, %s in stock.
+«%s»: добавлено %s %s — больше нет на складе	"%s": %s %s added — no more in stock
+«%s»: максимум %s %s — в минус нельзя	"%s": maximum %s %s — cannot go below zero
+«%s»: на складе ноль — списывать нечего	"%s": zero in stock — nothing to write off
+«%s»: не указана цена продажи — продать нельзя	"%s": no sale price set — cannot sell
+«%s»: нет на складе	"%s": out of stock
+«Выйти» на устройстве освобождает место само. Отвяжите устройство, если оно незнакомое или потеряно.	"Log out" on the device frees the slot by itself. Unlink the device if it is unfamiliar or lost.
+· остаток %s %s	· stock %s %s
+Автор не указан	Author not specified
+Адрес	Address
+Акт списания	Write-off report
+Активен	Active
+Активна	Active
+Активна до %s, потом отключится	Active until %s, then it switches off
+Активна до конца оплаченного периода	Active until the end of the paid period
+Активны: 	Active: 
+Активные	Active
+Активные входы	Active logins
+Активные категории	Active categories
+Активные товары	Active items
+Активных категорий нет.	No active categories.
+Арт: %s	SKU: %s
+Артикул	SKU
+Артикул / внутренний код	SKU / internal code
+Архив	Archive
+Архив · 	Archive · 
+Архив категорий	Category archive
+Архив пуст.	The archive is empty.
+Архив товаров	Item archive
+Архивировать	Archive
+Архивировать категорию?	Archive category?
+Архивировать товар?	Archive item?
+Архивная категория не показывается в фильтрах и в форме товара. Товары при этом остаются на складе.	An archived category is not shown in filters or in the item form. The items stay in stock.
+Аудит	Audit
+Без доступа к Bluetooth список принтеров не открыть	Without Bluetooth access the printer list cannot be opened
+Без имени	No name
+Без категории	No category
+Без клиента	No customer
+Без кода	No code
+Без кода · %s	No code · %s
+Без лишнего тапа: чек уходит на принтер, как только продажа проведена	No extra tap: the receipt goes to the printer as soon as the sale is completed
+Без поставщика	No supplier
+Бесплатные продажи закончились (%s). Выберите тариф, чтобы продолжать продавать и проводить приход.	Free sales have run out (%s). Choose a plan to keep selling and recording stock-ins.
+Бесплатный лимит веб-версии FonRo (%s) исчерпан. 	The free limit of the FonRo web version (%s) is used up. 
+Бесплатный полный доступ активен	Free full access is active
+Бесплатный полный доступ до %s	Free full access until %s
+Больше остатка списать нельзя	Cannot write off more than the stock
+Буфер обмена недоступен	Clipboard is not available
+Было: 	Was: 
+Быстрые действия	Quick actions
+В архив	To archive
+В архиве	In archive
+В ближайшие дни: %s · 	In the coming days: %s · 
+В долг	On credit
+В заказе нет позиций.	The order has no items.
+В кассе уже набран чек: позиций — %s. 	A receipt is already started at the till: items — %s. 
+В корзину	Add to cart
+В окне печати поставьте масштаб 100% и снимите поля по умолчанию — иначе наклейки уедут мимо разметки листа.	In the print dialog set the scale to 100% and remove the default margins — otherwise the labels will not line up with the sheet layout.
+В очереди	In queue
+В этой категории ничего не найдено.	Nothing found in this category.
+В этой категории пока нет товаров.	There are no items in this category yet.
+В этом статусе пусто.	Nothing in this status.
+ВСЕ ПРОДАННЫЕ ТОВАРЫ	ALL SOLD ITEMS
+Валюта витрины	Storefront currency
+Валюта кассы	Till currency
+Валюта сохранена	Currency saved
+Вариант: цвет, размер, память	Variant: color, size, memory
+Ваш ответ	Your reply
+Ваша версия: 	Your version: 
+Введите 6-значный код из письма.	Enter the 6-digit code from the email.
+Введите email и пароль.	Enter your email and password.
+Введите email.	Enter your email.
+Введите имя клиента	Enter the customer name
+Введите имя сотрудника	Enter the employee name
+Введите ключ доступа полностью.	Enter the full access key.
+Введите название	Enter a name
+Введите название товара.	Enter the item name.
+Введите номер чека	Enter the receipt number
+Введите номер чека или отсканируйте QR-код с чека.	Enter the receipt number or scan the QR code on the receipt.
+Введите штрихкод	Enter the barcode
+Верно	Correct
+Вернуть	Return
+Вернуть · 	Return · 
+Вернуть в кассу	Return to till
+Вернуть всё	Return all
+Вес	Weight
+Витрина закрыта: покупатели не видят магазин.	The storefront is closed: customers cannot see the shop.
+Витрина открыта: покупатели видят товары и делают заказы.	The storefront is open: customers can see items and place orders.
+Владелец	Owner
+Владелец + 	Owner + 
+Владелец входит по email и паролю — ключ доступа ему не нужен, а права у него полные и не редактируются.	The owner logs in with email and password — no access key is needed, and their rights are full and cannot be edited.
+Владелец имеет полный доступ ко всем разделам.	The owner has full access to all sections.
+Влияет только на то, как касса показывает суммы. У витрины и iOS-приложения валюта своя.	Affects only how the till shows amounts. The storefront and the iOS app have their own currency.
+Внесено при покупке	Paid at purchase
+Внесено сейчас:	Paid now:
+Внесите фактический остаток хотя бы по одному товару	Enter the actual stock for at least one item
+Возврат	Return
+Возврат 	Return 
+Возврат -%s	Return -%s
+Возврат · 	Return · 
+Возврат от %s	Return from %s
+Возврат проведён	Return completed
+Возврат товара	Item return
+Возврат −%s	Return −%s
+Возвратов	Returns
+Возвратов по этому товару не было.	There have been no returns for this item.
+Возвратов пока нет.	No returns yet.
+Возвраты	Returns
+Возвраты доступны сотрудникам с правом «Приём возвратов».	Returns are available to employees with the "Accept returns" right.
+Возвраты по дням	Returns by day
+Возвраты по часам	Returns by hour
+Возвращён	Returned
+Возвращённые товары	Returned items
+Возобновить подписку	Resume subscription
+Войти	Log in
+Войти с него снова можно будет тем же ключом — слот освободится.	You can log in from it again with the same key — the slot will be freed.
+Восстановить	Restore
+Восстановление пароля	Password recovery
+Все	All
+Все (%s)	All (%s)
+Все · 	All · 
+Все · %s	All · %s
+Все выбранные товары отмечены.	All selected items are marked.
+Все категории	All categories
+Все позиции, скидка и клиент будут сброшены.	All items, the discount and the customer will be cleared.
+Все чеки	All receipts
+Все чеки отправлены.	All receipts have been sent.
+Все штрихкоды	All barcodes
+Всего на складе, шт	Total in stock, pcs
+Всего: 	Total: 
+Вся сумма — картой	Full amount by card
+Всё возвращено	Everything returned
+Всё спокойно	All quiet
+Вход владельца	Owner login
+Вход выключен, права сохранятся	Login is off, rights will be kept
+Вход по ключу · права доступа	Key login · access rights
+Вход по ключу работает	Key login works
+Входим…	Logging in…
+Выберите готовые товары — они добавятся в магазин с фото и штрихкодом. Цены и остатки заполнит приход.	Pick ready-made items — they will be added to the shop with a photo and a barcode. Prices and stock will be filled in by a stock-in.
+Выберите клиента (обязательно)	Select a customer (required)
+Выберите месяц	Select a month
+Выберите поставщика и товары, которые пришли	Select the supplier and the items that arrived
+Выберите товары	Select items
+Выбран	Selected
+Выбран: %s	Selected: %s
+Выбрана	Selected
+Выдано кодов: %s, не удалось: %s	Codes issued: %s, failed: %s
+Выдать внутренние коды	Issue internal codes
+Выдать штрихкоды?	Issue barcodes?
+Выйти	Log out
+Выйти из аккаунта?	Log out of the account?
+Выполнен	Completed
+Выполненные	Completed
+Выпустить	Issue
+Выпустить новый ключ?	Issue a new key?
+Выручка	Revenue
+Где активен ваш ключ доступа	Where your access key is active
+Где искать	Where to search
+Где открыт ваш ключ	Where your key is open
+Годен до 	Best before 
+Готовится	Preparing
+Готово	Done
+Готовятся	Preparing
+График возвратов %s	Returns chart %s
+График долгов %s	Debt chart %s
+График прибыли %s	Profit chart %s
+График продаж %s	Sales chart %s
+Да, вернуть	Yes, return
+Да, выдать	Yes, issue
+Да, выйти	Yes, log out
+Да, отменить	Yes, cancel
+Да, очистить	Yes, clear
+Да, подтверждаю	Yes, I confirm
+Да, провести	Yes, post
+Да, удалить	Yes, delete
+Данных за период нет.	No data for the period.
+Дата	Date
+Дата ставится автоматически: %s	The date is set automatically: %s
+Действие	Action
+Действия	Actions
+Действует до %s	Valid until %s
+Действует, когда указана локация магазина, а покупатель отправил свою при заказе.	Works when the shop location is set and the customer shared theirs with the order.
+День закрыт: изменить и отменить можно только расход за сегодня.	The day is closed: only today's expense can be edited or cancelled.
+Детали долга	Debt details
+Динамика %s	Trend %s
+Длина	Length
+Для выбранного периода расходы не найдены.	No expenses found for the selected period.
+Для долга выберите клиента	Select a customer for the debt
+Добавить	Add
+Добавить · 	Add · 
+Добавить возврат	Add return
+Добавить выбранные	Add selected
+Добавить выбранные (%s)	Add selected (%s)
+Добавить категорию	Add category
+Добавить клиента	Add customer
+Добавить код	Add code
+Добавить нового сотрудника	Add a new employee
+Добавить поставщика	Add supplier
+Добавить расход	Add expense
+Добавить товар	Add item
+Добавить товары	Add items
+Добавлено из каталога: %s	Added from the catalog: %s
+Добавлено: 	Added: 
+Добавлено: %s	Added: %s
+Добавьте сюда штрихкоды разных партий этого же товара. При продаже сканер найдёт товар по любому из них.	Add here the barcodes of different batches of the same item. At the till the scanner will find the item by any of them.
+Добавьте товар	Add an item
+Документ отменён — товар вернулся на склад	Document cancelled — the items are back in stock
+Документов	Documents
+Долг	Debt
+Долг 	Debt 
+Долг клиента 	Customer debt 
+Долг полностью закрыт 🎉	The debt is fully paid off 🎉
+Долг поставщику	Debt to supplier
+Долг: %s	Debt: %s
+Долги	Debts
+Долги клиентов не загрузились — список показан без них	Customer debts failed to load — the list is shown without them
+Должников за период нет 🎉	No debtors for the period 🎉
+Дополнительно: шаг продажи, штрихкоды	Advanced: sale step, barcodes
+Дополнительные штрихкоды	Additional barcodes
+Доставка	Delivery
+Доступ сохранится до конца оплаченного периода, потом Премиум отключится. Возобновить можно будет до этой даты.	Access stays until the end of the paid period, then Premium switches off. You can resume before that date.
+Доступно к возврату: %s %s	Available to return: %s %s
+Доступно только владельцу магазина	Available only to the shop owner
+Дробный товар: можно продать часть — например 0,5.	Fractional item: you can sell a part — for example 0.5.
+Другое	Other
+Единиц	Units
+Единица	Unit
+Единица измерения	Unit of measure
+Есть долг	Has debt
+Ещё	More
+Ждут обработки	Awaiting processing
+Журнал	Log
+Журнал доступен владельцу и менеджерам	The log is available to the owner and managers
+Журнал доступен владельцу и сотрудникам с правом на настройки магазина.	The log is available to the owner and employees with the shop settings right.
+За «%s» возвратов нет.	No returns for "%s".
+За «%s» приходов нет.	No stock-ins for "%s".
+За «%s» проверок нет.	No stocktakes for "%s".
+За период долги не погашали.	No debts were repaid in the period.
+За этот день записей нет.	No records for this day.
+Забыли пароль?	Forgot your password?
+Загружаем архив…	Loading the archive…
+Загружаем долги…	Loading debts…
+Загружаем историю товара…	Loading item history…
+Загружаем оплаты…	Loading payments…
+Загружаем переписку…	Loading the conversation…
+Загружаем покупки…	Loading purchases…
+Загружаем список…	Loading the list…
+Загружаем статистику…	Loading statistics…
+Загружаем…	Loading…
+Загрузка…	Loading…
+Задайте адрес витрины в настройках	Set the storefront address in settings
+Заказ #%s	Order #%s
+Заказ %s выполнен	Order %s completed
+Заказ %s отменён	Order %s cancelled
+Заказ %s перенесён в кассу	Order %s moved to the till
+Заказ %s подтверждён	Order %s confirmed
+Заказов ждут обработки: %s	Orders awaiting processing: %s
+Заказов нет	No orders
+Заказы не загрузились	Orders failed to load
+Заказы онлайн	Online orders
+Закрыт	Closed
+Закрытия	Payoffs
+Закрытия долгов	Debt payoffs
+Закрыть	Close
+Закрыть долг	Pay off debt
+Закуп	Cost
+Закупка	Purchase
+Закупочная цена	Cost price
+Заменить	Replace
+Заменить корзину?	Replace the cart?
+Заметка	Note
+Заметка к проверке	Stocktake note
+Заполните имя, название магазина, email и пароль.	Fill in your name, shop name, email and password.
+Заполните название и цены — остальное можно позже	Fill in the name and prices — the rest can wait
+Зарегистрироваться	Sign up
+Заходили: 	Logged in: 
+ИТОГО	TOTAL
+Излишек	Surplus
+Изменить	Edit
+Изменить и отменить можно только расход за сегодня — за прошлые дни цифры закрыты.	Only today's expense can be edited or cancelled — figures for past days are closed.
+Изменить клиента	Change customer
+Изменить расход	Edit expense
+Изменить товар	Edit item
+Изменён	Changed
+Имя	Name
+Имя *	Name *
+Имя и фамилия	First and last name
+Имя*	Name*
+Инвентаризаций по этому товару не было.	There have been no stocktakes for this item.
+Инвентаризаций пока не было. Нажмите «Начать инвентаризацию».	There have been no stocktakes yet. Tap "Start stocktake".
+Инвентаризация	Stocktake
+Инвентаризация 	Stocktake 
+Инвентаризация доступна сотрудникам с правом «Инвентаризация». Историю проверок видно всем.	Stocktake is available to employees with the "Stocktake" right. The stocktake history is visible to everyone.
+Инвентаризация проведена	Stocktake completed
+Использовано %s из %s бесплатных продаж, осталось %s.	%s of %s free sales used, %s left.
+История возвратов	Return history
+История оплаты	Payment history
+История приходов	Stock-in history
+История проверок	Stocktake history
+История расходов	Expense history
+История списаний	Write-off history
+Итого	Total
+Итого · наличными	Total · cash
+Итого по закупке	Purchase total
+Итого списано: 	Total written off: 
+Ищем чек…	Looking for the receipt…
+Ищем…	Searching…
+К возврату %s. 	To return %s. 
+К оплате	To pay
+К печати	To print
+КЛ	CL
+Каждому присвоим внутренний EAN-13 (начинается на 2 — этот диапазон отведён под коды магазина). Существующие коды не тронем.	We will assign each an internal EAN-13 (starting with 2 — this range is reserved for in-shop codes). Existing codes will not be touched.
+Как будет выглядеть	How it will look
+Как в приложении (%s)	Same as in the app (%s)
+Как записать покупателя	How to record a customer
+Как подключить принтер	How to connect a printer
+Камера недоступна	Camera is not available
+Камера недоступна. Введите код вручную.	Camera is not available. Enter the code manually.
+Карта	Card
+Карта недоступна без интернета	The map is not available offline
+Картой	By card
+Карточка категории	Category card
+Карточка клиента	Customer card
+Карточка клиента магазина	Shop customer card
+Карточка клиента — тап по строке	Customer card — tap the row
+Карточка сотрудника	Employee card
+Карточка товара	Item card
+Карточка товара — тап по строке	Item card — tap the row
+Кассир	Cashier
+Кассир: %s	Cashier: %s
+Каталог FonRo	FonRo catalog
+Каталог пока пуст.	The catalog is empty for now.
+Каталог пуст — пересчитывать нечего	The catalog is empty — nothing to count
+Каталог пуст — сначала добавьте товары.	The catalog is empty — add items first.
+Категории	Categories
+Категории %s	Categories %s
+Категорий пока нет.	No categories yet.
+Категория	Category
+Категория в архиве	Category archived
+Категория вернулась в список	The category is back in the list
+Категория создана	Category created
+Категориями управляют сотрудники с правом «Категории».	Categories are managed by employees with the "Categories" right.
+Клиент	Customer
+Клиент #%s	Customer #%s
+Клиент добавлен	Customer added
+Клиент создан	Customer created
+Клиент:	Customer:
+Клиентов	Customers
+Клиентов не найдено.	No customers found.
+Клиентов пока нет. Добавьте первого кнопкой выше.	No customers yet. Add the first one with the button above.
+Клиенты	Customers
+Клиенты с долгами	Customers with debts
+Клиенты с самым большим долгом	Customers with the largest debt
+Ключ выдаёт владелец в разделе «Сотрудники». Один ключ — одно устройство.	The key is issued by the owner in the "Employees" section. One key — one device.
+Ключ доступа	Access key
+Ключ доступа FonRo	FonRo access key
+Ключ доступа сотрудника	Employee access key
+Ключ ещё нигде не активирован.	The key has not been activated anywhere yet.
+Ключ скопирован	Key copied
+Ключевые показатели	Key figures
+Код из письма	Code from the email
+Код отправлен повторно. Проверьте почту и папку «Спам».	The code has been sent again. Check your inbox and the "Spam" folder.
+Кода нет · %s %s	No code · %s %s
+Коды выданы — теперь эти товары можно печатать	Codes issued — these items can be printed now
+Кол-во, %s	Qty, %s
+Количество	Quantity
+Количество: 	Quantity: 
+Команда магазина	Shop team
+Копировать	Copy
+Корзина	Cart
+Корзина будет очищена, устройство отвяжется от ключа — слот освободится.	The cart will be cleared, the device will be unlinked from the key — the slot will be freed.
+Кроме владельца пока никого нет	No one but the owner yet
+Кто записал	Who recorded it
+Кто и сколько оплатил по выбранному периоду	Who paid and how much in the selected period
+Кто и что изменил · было → стало	Who changed what · was → now
+Кто сколько продал за %s	Who sold how much in %s
+Куплено %s %s · уже вернули %s	Bought %s %s · already returned %s
+Листов A4	A4 sheets
+Листы A4	A4 sheets
+Листы A4 — обычная самоклейка из канцелярского магазина. Остальные размеры — для этикеточного принтера с рулоном.	A4 sheets are ordinary self-adhesive paper from a stationery shop. The other sizes are for a label printer with a roll.
+Логин и пароль — те же, что в приложении FonRo.	The login and password are the same as in the FonRo app.
+Магазин	Shop
+Мало на складе	Low stock
+Менеджер	Manager
+Меняйте что нужно, остальное останется как было	Change what you need, the rest stays as it was
+Мин. сумма товаров для бесплатной доставки (0 — без минимума)	Min. item amount for free delivery (0 — no minimum)
+Мои устройства	My devices
+Мой магазин	My shop
+Мой онлайн-магазин	My online shop
+На листе	Per sheet
+На сколько кнопки + и − меняют количество этого товара в продаже.	How much the + and − buttons change the quantity of this item in a sale.
+На сумму 	Totalling 
+На этом устройстве нет системной печати	This device has no system printing
+Наведите камеру на штрихкод товара.	Point the camera at the item barcode.
+Нажмите возврат, чтобы посмотреть детали	Tap a return to see the details
+Нажмите документ, чтобы посмотреть состав	Tap a document to see its contents
+Нажмите на карту, чтобы поставить точку. Голубой круг — радиус бесплатной доставки.	Tap the map to place a point. The blue circle is the free delivery radius.
+Нажмите продажу, чтобы посмотреть состав	Tap a sale to see its contents
+Назад	Back
+Название	Name
+Название *	Name *
+Название магазина	Shop name
+Название соберётся так: Чехол · Чёрный · M	The name will be built like this: Case · Black · M
+Название товара	Item name
+Название — минимум 2 символа	Name — at least 2 characters
+Название, артикул или код	Name, SKU or code
+Найти чек	Find receipt
+Накладная	Delivery note
+Накладная № 	Delivery note № 
+Наклеек подряд	Labels in a row
+Наклейки для товаров, которые приехали без кода	Labels for items that arrived without a code
+Наличные	Cash
+Наличные + карта = сумма чека	Cash + card = receipt total
+Наличными	In cash
+Напишите нам — ответим в течение рабочего дня.	Write to us — we will reply within one business day.
+Напишите сообщение…	Write a message…
+Например: Ali Valiyev	For example: Ali Valiyev
+Например: COLA-001	For example: COLA-001
+Например: Coca Cola	For example: Coca Cola
+Например: Напитки	For example: Drinks
+Например: Ойбек Трейд	For example: Oybek Trade
+Например: возит воду по вторникам	For example: delivers water on Tuesdays
+Например: клиент вернул товар	For example: the customer returned an item
+Например: пересчёт после смены	For example: recount after the shift
+Например: привезли утром, коробка помята	For example: delivered in the morning, box is dented
+Например: товара нет в наличии	For example: the item is out of stock
+Настройки	Settings
+Настройки магазина	Shop settings
+Настройки магазина сохранены	Shop settings saved
+Наценка	Markup
+Наценка %s%% · прибыль %s	Markup %s%% · profit %s
+Наценка с единицы: 	Markup per unit: 
+Начать инвентаризацию	Start stocktake
+Не вернулись: 	Not returned: 
+Не выбран	Not selected
+Не выбран — чек уйдёт в системную печать	Not selected — the receipt will go to system printing
+Не готово	Not ready
+Не отмечено · %s	Not marked · %s
+Не перенесены: 	Not moved: 
+Не показывать	Do not show
+Не удалось записать документ	Could not save the document
+Не удалось напечатать чек	Could not print the receipt
+Не удалось открыть браузер для оплаты	Could not open the browser for payment
+Не удалось открыть звонилку	Could not open the phone dialer
+Не удалось открыть настройки Bluetooth	Could not open Bluetooth settings
+Не удалось открыть системную печать	Could not open system printing
+Не удалось открыть ссылку	Could not open the link
+Не удалось открыть страницу оплаты	Could not open the payment page
+Не удалось подготовить документ	Could not prepare the document
+Недостача	Shortage
+Неизвестная ошибка	Unknown error
+Необязательно	Optional
+Непогашенные долги	Outstanding debts
+Непогашенных долгов за период нет 🎉	No outstanding debts for the period 🎉
+Нет в наличии	Out of stock
+Нет данных за период.	No data for the period.
+Нет долгов за выбранный период.	No debts for the selected period.
+Нет доступа к Bluetooth. Разрешите его в настройках телефона.	No Bluetooth access. Allow it in your phone settings.
+Нет доступа к долгам	No access to debts
+Нет доступа к истории продаж	No access to sales history
+Нет доступа к камере. Разрешите её в настройках телефона.	No camera access. Allow it in your phone settings.
+Нет доступа к расходам	No access to expenses
+Нет доступа к этому разделу	No access to this section
+Нет доступа.	No access.
+Нет права на возвраты	No right to accept returns
+Нет права на изменение товаров	No right to edit items
+Нет права на инвентаризацию	No right to run a stocktake
+Нет права на приход	No right to record stock-ins
+Нет права на расходы	No right to record expenses
+Нет соединения с сервером. Проверьте интернет.	No connection to the server. Check your internet.
+Нечего печатать: не выбран ни один товар	Nothing to print: no item selected
+Никого не нашлось	No one found
+Ничего не найдено	Nothing found
+Ничего не найдено.	Nothing found.
+Ничего не найдено. Проверьте название или штрихкод.	Nothing found. Check the name or the barcode.
+Ничего не отмечено	Nothing marked
+Новая инвентаризация	New stocktake
+Новая категория	New category
+Новые	New
+Новые заказы	New orders
+Новые заказы с онлайн-витрины	New orders from the online storefront
+Новый	New
+Новый возврат	New return
+Новый клиент	New customer
+Новый ключ выпущен — передайте его сотруднику	A new key has been issued — give it to the employee
+Новый код	New code
+Новый пароль	New password
+Новый пароль (минимум 6 символов)	New password (at least 6 characters)
+Новый поставщик	New supplier
+Новый приход	New stock-in
+Новый расход	New expense
+Новый сотрудник	New employee
+Новый товар	New item
+Новый штрихкод	New barcode
+Новых заказов нет	No new orders
+Номер накладной	Delivery note number
+Номер чека	Receipt number
+Обновите FonRo	Update FonRo
+Обновить	Update
+Оборот по приходам	Stock-in turnover
+Общий долг	Total debt
+Объём	Volume
+Один ключ доступа работает на ограниченном числе устройств. Отвязка освобождает слот: на отвязанном телефоне вход перестанет работать сразу, а на этом останется как есть.	One access key works on a limited number of devices. Unlinking frees a slot: on the unlinked phone login stops working immediately, and on this one it stays as it is.
+Онлайн	Online
+Онлайн-магазин	Online shop
+Описание для покупателей	Description for customers
+Опишите вопрос или проблему — ответим прямо здесь. Переписку видите только вы и поддержка.	Describe your question or problem — we will reply right here. Only you and support can see the conversation.
+Оплат ещё не было	No payments yet
+Оплата	Payment
+Оплата ещё не подтверждена. Если только что оплатили — подождите минуту и нажмите ещё раз.	The payment is not confirmed yet. If you have just paid — wait a minute and tap again.
+Оплата ещё не подтверждена. Если только что оплатили — подождите минуту.	The payment is not confirmed yet. If you have just paid — wait a minute.
+Оплачен	Paid
+Оплачено	Paid
+Оплачено 	Paid 
+Оплачено поставщику	Paid to supplier
+Оплачено:	Paid:
+Основной штрихкод	Main barcode
+Осталось	Left
+Останется долг:	Remaining debt:
+Остаток	Stock
+Остаток %s %s	Stock %s %s
+Остаток ≤ %s · 	Stock ≤ %s · 
+Остаток, шт	Stock, pcs
+Остаток: %s %s	Stock: %s %s
+Ответ на отзыв	Reply to review
+Ответ покупателю	Reply to customer
+Ответ сохранён	Reply saved
+Ответы службы поддержки	Support replies
+Отвязать	Unlink
+Отвязать устройство?	Unlink the device?
+Отзывов пока нет	No reviews yet
+Отключить принтер	Disconnect printer
+Отключён	Disabled
+Открыт	Open
+Открытый	Open
+Открытых долгов нет 🎉	No open debts 🎉
+Открыть чек	Open receipt
+Отложенная отправка	Deferred sending
+Отложенные чеки	Deferred receipts
+Отложенные чеки отправлены	Deferred receipts sent
+Отложенных чеков нет	No deferred receipts
+Отложить чек	Park receipt
+Отмена	Cancel
+Отменить	Cancel
+Отменить заказ	Cancel order
+Отменить заказ?	Cancel order?
+Отменить подписку	Cancel subscription
+Отменить подписку?	Cancel subscription?
+Отменить расход	Cancel expense
+Отменить расход?	Cancel expense?
+Отменить списание	Cancel write-off
+Отменить списание?	Cancel write-off?
+Отменён	Cancelled
+Отменённые	Cancelled
+Отметьте «Верно» или внесите фактический остаток.	Tick "Correct" or enter the actual stock.
+Отметьте хотя бы один товар	Select at least one item
+Отмечено · %s из %s	Selected · %s of %s
+Отмечено: 	Selected: 
+Отправить	Send
+Отправить код ещё раз	Resend code
+Отправить сейчас	Send now
+Отправка отложенных чеков	Sending pending receipts
+Отправлено: 	Sent: 
+Отправляем код…	Sending code…
+Отправляем…	Sending…
+Отсканированные товары	Scanned items
+Оформить подписку	Subscribe
+Оформление кассы на этом устройстве. На печать чеков и этикеток не влияет.	Till appearance on this device. Does not affect receipt or label printing.
+Оформление локальной продажи	Completing a local sale
+Очередь пуста — ни одна продажа не потерялась.	Queue is empty — no sale was lost.
+Очистить	Clear
+Очистить чек?	Clear receipt?
+Ошибка	Error
+Ошибка сервера (%s)	Server error (%s)
+Пара слов о магазине	A few words about the shop
+Параметр 1	Option 1
+Параметр 2	Option 2
+Пароли не совпадают.	Passwords do not match.
+Пароль	Password
+Пароль (минимум 6 символов)	Password (at least 6 characters)
+Пароль должен быть минимум 6 символов.	Password must be at least 6 characters.
+Пароль обновлён. Войдите с новым паролем.	Password updated. Sign in with the new password.
+Первичная оплата	Initial payment
+Перевыпустить ключ	Reissue key
+Перенос заказа очистит корзину и положит в неё товары заказа.	Moving the order will clear the cart and put the order's items into it.
+Переносить нечего: этих товаров нет в каталоге или нет на складе	Nothing to move: these items are not in the catalogue or not in stock
+Печатаем…	Printing…
+Печатать чек сразу после продажи	Print receipt right after the sale
+Печать	Print
+Печать доступна только при открытом приложении	Printing works only while the app is open
+Печать штрихкодов	Barcode printing
+По количеству	By quantity
+По ней считается, сколько знаков влезает в строку чека	Used to work out how many characters fit in a receipt line
+По одной	One by one
+По сумме	By amount
+По этой позиции возвращать нечего	Nothing to return for this line
+Повторите пароль	Repeat password
+Повторить	Retry
+Погашение долга	Debt repayment
+Погашений долга не было.	No debt repayments yet.
+Погашено	Repaid
+Подарок от FonRo	Gift from FonRo
+Поддержка	Support
+Поддержка FonRo	FonRo support
+Поделитесь ссылкой магазина с покупателями.	Share the shop link with customers.
+Поделиться ссылкой	Share link
+Подписка активна	Subscription active
+Подписка активна. Спасибо!	Subscription active. Thank you!
+Подписка возобновлена	Subscription resumed
+Подписка отменена	Subscription cancelled
+Подписка отменена. Доступ — до конца периода.	Subscription cancelled. Access lasts until the end of the period.
+Подпиской магазина распоряжается владелец.	The shop subscription is managed by the owner.
+Подтвердить	Confirm
+Подтверждён	Confirmed
+Подытог	Subtotal
+Позиции не переданы сервером.	The server did not send the line items.
+Позиции проверки	Check lines
+Позиции чека	Receipt lines
+Позиций	Lines
+Позиций: %s	Lines: %s
+Позиций: %s. Разница %s 	Lines: %s. Difference %s 
+Поиск	Search
+Поиск в каталоге…	Search the catalogue…
+Поиск клиента	Find customer
+Поиск по долгам	Search debts
+Поиск по имени или телефону	Search by name or phone
+Поиск по названию, телефону или заметке	Search by name, phone or note
+Поиск среди выбранных	Search within selected
+Поиск товара или кода	Search item or code
+Поиск товара, артикула или кода	Search item, SKU or code
+Поиск товара, кода или артикула	Search item, code or SKU
+Поиск товара, штрихкод	Search item, barcode
+Пока не получилось. Чеки останутся в очереди и уйдут сами, как только появится связь.	Didn't work this time. The receipts stay in the queue and will send themselves once there is a connection.
+Показаны первые %s из %s — уточните поиск.	Showing the first %s of %s — refine your search.
+Показаны последние %s из %s —	Showing the last %s of %s —
+Показатели магазина скрыты правами доступа.	Shop figures are hidden by access rights.
+Показать	Show
+Показать ещё (%s)	Show more (%s)
+Показать товары категории	Show category items
+Покупатели смогут оставлять отзывы на витрине.	Customers will be able to leave reviews on the storefront.
+Покупатели увидят все цены на витрине в этой валюте.	Customers will see all storefront prices in this currency.
+Покупатели увидят это на странице «О магазине» витрины вместе с адресом, телефоном и отзывами.	Customers will see this on the storefront's "About the shop" page together with the address, phone and reviews.
+Покупатель	Customer
+Покупатель увидит отмену заказа %s. 	The customer will see that order %s was cancelled. 
+Покупки в долг	Credit purchases
+Покупок у этого клиента ещё не было.	This customer has no purchases yet.
+Политика конфиденциальности	Privacy policy
+Полный возврат	Full return
+Полный доступ	Full access
+Получено	Received
+Получено долгов	Debts collected
+Получено меньше суммы чека	Received less than the receipt total
+Получено наличными	Received in cash
+Получено:	Received:
+Получить код	Get code
+Порог «мало на складе»	"Low stock" threshold
+Порог сохранён: %s шт	Threshold saved: %s pcs
+Порча, бой, просрочка — товар уходит со склада	Damage, breakage, expiry — the item leaves stock
+После создания сотрудник получит ключ доступа — по нему он войдёт в приложение на своём телефоне.	Once created, the employee gets an access key — they use it to sign in to the app on their own phone.
+Поставщик	Supplier
+Поставщик добавлен	Supplier added
+Поставщик:	Supplier:
+Поставщики	Suppliers
+Поставщики и оборот по приходам	Suppliers and stock-in turnover
+Поставщиков	Suppliers
+Поставщиков в справочнике	Suppliers in the directory
+Поставщиков нет — добавьте их в разделе «Поставщики».	No suppliers — add them in the "Suppliers" section.
+Поставщиков пока нет — добавьте первого.	No suppliers yet — add the first one.
+Почему чек здесь	Why this receipt is here
+Прав выдано	Rights granted
+Права доступа	Access rights
+Права не выданы.	No rights granted.
+Права обновлены	Rights updated
+Правовая информация	Legal information
+Премиум активен. Спасибо!	Premium active. Thank you!
+Прибыль	Profit
+Прибыль %s	Profit %s
+Прибыль по дням	Profit by day
+Прибыль по часам	Profit by hour
+Прибыль после расходов	Profit after expenses
+Приложение	App
+Применить	Apply
+Принимаем…	Accepting…
+Принтер	Printer
+Принтер «%s» выбран	Printer "%s" selected
+Принтер выбран неверно. Выберите его заново.	Wrong printer selected. Choose it again.
+Принтер не отвечает. Проверьте, включён ли он и рядом ли.	The printer is not responding. Check that it is on and nearby.
+Принтер отключён. Чеки пойдут в системную печать.	Printer off. Receipts will go to system printing.
+Принтер чеков	Receipt printer
+Принял	Accepted by
+Принял: %s	Accepted by: %s
+Принято. Остаток: %s	Accepted. Stock: %s
+Принято: %s	Accepted: %s
+Принять	Accept
+Принять:	Accept:
+Приход	Stock-in
+Приход · 	Stock-in · 
+Приход без привязки к контрагенту	Stock-in with no counterparty
+Приход доступен сотрудникам с правом «Приход».	Stock-in is available to employees with the "Stock-in" right.
+Приход не проведён	Stock-in not posted
+Приход недоступен	Stock-in unavailable
+Приход проведён	Stock-in posted
+Приходов	Stock-ins
+Приходов от этого поставщика ещё не было.	No stock-ins from this supplier yet.
+Приходов по этому товару нет.	No stock-ins for this item.
+Приходов пока нет.	No stock-ins yet.
+Приходы от поставщика	Stock-ins from supplier
+Причина	Reason
+Причина списания	Write-off reason
+Причина: %s	Reason: %s
+Причину он тоже прочитает — напишите её понятно.	They will read the reason too — write it clearly.
+Пробная печать	Test print
+Проверил	Checked by
+Проверка	Check
+Проверок	Checks
+Проверьте соединение и обновите.	Check your connection and refresh.
+Проверяем…	Checking…
+Провести	Post
+Провести · %s	Post · %s
+Провести возврат?	Post the return?
+Провести инвентаризацию?	Post the stocktake?
+Проводим…	Posting…
+Провёл: %s	Posted by: %s
+Продаж	Sales
+Продаж за период нет	No sales for the period
+Продаж за период нет.	No sales for the period.
+Продаж нет · %s	No sales · %s
+Продажа	Sale
+Продажа недоступна	Sale unavailable
+Продажа проведена · %s	Sale posted · %s
+Продажи	Sales
+Продажи в долг	Credit sales
+Продажи за 7 дней	Sales over 7 days
+Продажи по дням	Sales by day
+Продажи по часам	Sales by hour
+Продажи, количество	Sales, quantity
+Продажи, сумма	Sales, amount
+Продал: %s	Sold by: %s
+Проданные товары	Items sold
+Проданные чеки	Sold receipts
+Проданный чек	Sold receipt
+Продано	Sold
+Продаёте дешевле закупки — проверьте цены.	You are selling below cost price — check the prices.
+Продолжить · %s	Continue · %s
+Промокод (если есть)	Promo code (if any)
+Промокод не найден	Promo code not found
+Промокод применён: −%s%%	Promo code applied: −%s%%
+Процент	Percent
+Пустой ответ сервера	Empty server response
+Радиус бесплатной доставки, км (0 — выключено)	Free delivery radius, km (0 — off)
+Размер наклейки	Label size
+Размер наклейки:	Label size:
+Размер подписей во всём приложении на этом устройстве. На печать чеков и этикеток не влияет.	Text size across the whole app on this device. Does not affect receipt or label printing.
+Размер текста	Text size
+Размер чека	Receipt size
+Размер чека: %s мм	Receipt size: %s mm
+Разница	Difference
+Разница, сумма	Difference, amount
+Разница, шт	Difference, pcs
+Разница: 	Difference: 
+Разрешить доступ	Allow access
+Разрешить камеру	Allow camera
+Распечатать чек	Print receipt
+Расход	Expense
+Расход записан	Expense recorded
+Расход изменён	Expense updated
+Расход отменён	Expense cancelled
+Расходов нет	No expenses
+Расходы	Expenses
+Расходы за период	Expenses for the period
+Расхождений нет.	No discrepancies.
+Расхождения	Discrepancies
+Регистрация	Sign up
+Роль	Role
+Рулон	Roll
+Сводка	Summary
+Сводка %s	Summary %s
+Сдача	Change
+Сдача:	Change:
+Сдача: %s	Change: %s
+Себестоимость	Cost price
+Сегодня	Today
+Сейчас: 	Now: 
+Сервер временно недоступен. Попробуйте ещё раз.	The server is temporarily unavailable. Try again.
+Сервер не вернул клиента	The server did not return the customer
+Сервер не вернул сохранённый товар	The server did not return the saved item
+Сервер не отвечает. Попробуйте ещё раз.	The server is not responding. Try again.
+Сервер отклонил документ	The server rejected the document
+Сервер применит расхождения к остаткам склада.	The server will apply the discrepancies to stock.
+Сессия истекла. Войдите заново.	Session expired. Sign in again.
+Сети нет — чек сохранён и уйдёт на сервер сам, как только связь появится.	No network — the receipt is saved and will go to the server itself as soon as there is a connection.
+Система	System
+Сканирование	Scanning
+Сканировать	Scan
+Сканировать QR чека	Scan receipt QR
+Сканировать заново	Scan again
+Сканировать код	Scan code
+Сканировать штрихкод	Scan barcode
+Скидка	Discount
+Скидка · %s	Discount · %s
+Скидка на позицию	Line discount
+Скидка на чек	Receipt discount
+Скидка применится на странице оплаты	The discount will be applied on the payment page
+Скидка, %	Discount, %
+Скидка, %:	Discount, %:
+Скидка, сумма	Discount, amount
+Скидка, сумма:	Discount, amount:
+Сколько наклеек: %s	How many labels: %s
+Скоро истекает срок	Expiring soon
+Скрыто	Hidden
+Скрыты из продажи	Hidden from sale
+Смешанно	Mixed
+Смотреть все продажи и товары	View all sales and items
+Снять	Remove
+Создан	Created
+Создать	Create
+Создать категорию	Create category
+Состав документа	Document contents
+Состав заказа · %s	Order contents · %s
+Состав чека сервер не прислал	The server did not send the receipt contents
+Сотрудник	Employee
+Сотрудник · ключ	Employee · key
+Сотрудник создан	Employee created
+Сотрудники	Employees
+Сотрудников пока нет. Добавьте первого кнопкой выше.	No employees yet. Add the first one with the button above.
+Сохранено	Saved
+Сохранить	Save
+Сохранить изменения	Save changes
+Сохранить пароль	Save password
+Сохранить приход	Save stock-in
+Сохраняем…	Saving…
+Спаренных устройств нет. Включите принтер и сопрягите его в настройках Bluetooth — потом вернитесь сюда.	No paired devices. Turn the printer on and pair it in Bluetooth settings — then come back here.
+Спасибо за отзыв!	Thanks for your review!
+Списание	Write-off
+Списание отменено, товар вернулся на склад	Write-off cancelled, the item is back in stock
+Списание появится после обновления серверной части.	Write-off will appear after the server side is updated.
+Списание товара	Item write-off
+Списаний за период не было	No write-offs for the period
+Списано единиц	Units written off
+Списать	Write off
+Список	List
+Список клиентов	Customer list
+Список поставщиков	Supplier list
+Список пуст. Наведите камеру на штрихкод.	The list is empty. Point the camera at a barcode.
+Список сотрудников не загрузился. Проверьте соединение.	The employee list did not load. Check your connection.
+Список устройств не загрузился. Проверьте соединение.	The device list did not load. Check your connection.
+Способ получения	Fulfilment method
+Справочник	Directory
+Справочник ещё не загружен — закрытия долгов приедут вместе с ним.	The directory has not loaded yet — debt repayments will arrive with it.
+Среднее	Average
+Средний	Medium
+Средний чек	Average receipt
+Срок годности	Expiry date
+Срок годности вышел	Expiry date passed
+Срок годности: не указан	Expiry date: not set
+Ссылка магазина	Shop link
+Ссылка на оплату ещё не настроена. Напишите в поддержку.	The payment link is not set up yet. Write to support.
+Ссылка на оплату ещё не настроена. Обратитесь в поддержку.	The payment link is not set up yet. Contact support.
+Старый ключ «%s» перестанет работать немедленно, 	The old key "%s" will stop working immediately, 
+Старый ключ перестанет работать сразу: сотрудник останется без входа, пока не получит новый.	The old key stops working right away: the employee cannot sign in until they get a new one.
+Стат	Stats
+Статистика	Statistics
+Статус	Status
+Статус: в долге	Status: in debt
+Статус: оплачено %s из %s	Status: paid %s of %s
+Стоимость	Value
+Стоимость склада по закупке	Stock value at cost price
+Стоимость склада по продаже	Stock value at sale price
+Строк	Rows
+Сумма	Amount
+Сумма возврата	Return amount
+Сумма возвратов	Returns amount
+Сумма закупки	Purchase amount
+Сумма оплаты (долг %s)	Payment amount (debt %s)
+Сумма по всем непогашенным чекам	Total of all unpaid receipts
+Сумма прихода	Stock-in amount
+Сумма приходов	Stock-ins amount
+Сумма продажи	Sale amount
+Сумма расхода	Expense amount
+Сумма расхождения: 	Discrepancy amount: 
+Сумма склада	Stock value
+Сумма чека	Receipt total
+Сумма:	Amount:
+Сумма: 	Amount: 
+Суммы без буквенного кода	Amounts without a currency code
+Так будет выглядеть текст в приложении.	This is how text will look in the app.
+Такой код уже есть	This code already exists
+Тариф ограничивает только число сотрудников в веб-версии. Товары, статистика, долги, клиенты и другие разделы работают без ограничений.	The plan limits only the number of employees in the web version. Items, statistics, debts, customers and other sections work without limits.
+Тариф ограничивает только число сотрудников. Товары, статистика и остальные разделы — без ограничений.	The plan limits only the number of employees. Items, statistics and the other sections have no limits.
+Текущие категории магазина	Current shop categories
+Телефон	Phone
+Телефон (необязательно)	Phone (optional)
+Телефон не указан	No phone
+Тема оформления	Theme
+Товар	Item
+Товар #%s	Item #%s
+Товар в архиве	Item archived
+Товар вернулся в продажу	The item is back on sale
+Товар вернётся на склад, документ останется в истории с пометкой «отменён». Отменить можно только в день списания.	The item returns to stock, the document stays in history marked "cancelled". You can only cancel on the day of the write-off.
+Товар вернётся на склад.	The item will return to stock.
+Товар заканчивается	Item running low
+Товар с кодом %s не найден	No item found with code %s
+Товар с таким кодом не найден	No item found with this code
+Товар создан	Item created
+Товар создан, приход проведён	Item created, stock-in posted
+Товар сохранён, но приход не прошёл: 	Item saved, but the stock-in failed: 
+Товар списан, склад уменьшен	Item written off, stock reduced
+Товар уже в списке	Item already in the list
+Товар №%s	Item №%s
+Товаров	Items
+Товаров без кода: %s. Каждому присвоим внутренний EAN-13. 	Items without a code: %s. Each will get an internal EAN-13. 
+Товаров в документе нет. Добавьте их поиском или сканером.	There are no items in the document. Add them by search or scanner.
+Товаров нет.	No items.
+Товаров нет. Добавьте их во вкладке «Товары».	No items. Add them on the "Items" tab.
+Товары	Items
+Товары без штрихкода: %s	Items without a barcode: %s
+Товары в чеке	Items in the receipt
+Товары ещё не выбраны. Нажмите «Добавить товары» и отметьте всё, что стоит на полке.	No items selected yet. Tap "Add items" and tick everything on the shelf.
+Товары из Excel	Items from Excel
+Товары категории	Category items
+Товары не выбраны	No items selected
+Топ-10 за %s	Top 10 for %s
+Точка не задана — нажмите на карту.	No point set — tap the map.
+Требуется подписка.	A subscription is required.
+У этого устройства нет Bluetooth. Чеки будут печататься через системный диалог Android.	This device has no Bluetooth. Receipts will print via the Android system dialog.
+Убрать	Remove
+Убрать из документа	Remove from document
+Убрать клиента	Remove customer
+Убрать точку	Remove point
+Убыток по себестоимости	Loss at cost price
+Убыток: 	Loss: 
+Уведомления	Notifications
+Удалено: %s	Deleted: %s
+Удалить	Delete
+Удалить код	Delete code
+Удалить чек	Delete receipt
+Удалить чек %s?	Delete receipt %s?
+Удалён	Deleted
+Уже существующие коды не тронем.	Existing codes will not be touched.
+Уйдут сами при появлении связи	They will send themselves once there is a connection
+Укажите количество хотя бы по одной позиции	Enter a quantity for at least one line
+Укажите количество хотя бы по одному товару	Enter a quantity for at least one item
+Укажите количество — здесь появится образец наклейки.	Enter a quantity — a label preview will appear here.
+Укажите сумму	Enter an amount
+Укажите цену продажи — по ней товар будет продаваться.	Enter the sale price — the item will be sold at it.
+Укажите, сколько наклеек напечатать	Enter how many labels to print
+Установлена устаревшая версия приложения. Обновите его в Google Play, чтобы продолжить работу.	An outdated version of the app is installed. Update it in Google Play to continue.
+Устройств нет — ключ ещё нигде не активирован.	No devices — the key has not been activated anywhere yet.
+Устройства	Devices
+Устройство	Device
+Устройство отвязано	Device unlinked
+Учёт	Accounting
+Учёт, %s	Accounting, %s
+Ушло на сервер: 	Sent to server: 
+Факт	Actual
+Фактически	Actual
+Цвет	Color
+Цена	Price
+Цена доставки (0 — бесплатно)	Delivery price (0 — free)
+Цена прихода	Stock-in price
+Цена прихода: 	Stock-in price: 
+Цена продажи	Sale price
+Цены и остаток	Prices and stock
+Цифры кода под полосками	Code digits under the bars
+Частично	Partly
+Частичный возврат	Partial return
+Чат с командой FonRo	Chat with the FonRo team
+Чек	Receipt
+Чек 	Receipt 
+Чек #%s	Receipt #%s
+Чек %s. Позиций: %s. 	Receipt %s. Lines: %s. 
+Чек / товары	Receipt / items
+Чек вернулся в кассу	The receipt is back at the till
+Чек исчезнет с устройства и на сервер больше не попадёт: продажи в отчётах магазина не будет, а списанный остаток останется списанным. Удаляйте только тот чек, который сервер уже отверг по существу.	The receipt will disappear from the device and will never reach the server: the sale will not appear in shop reports, and the deducted stock will stay deducted. Only delete a receipt that the server has already rejected on the merits.
+Чек не найден. Проверьте номер.	Receipt not found. Check the number.
+Чек отложен — касса свободна	Receipt parked — the till is free
+Чек отправлен на принтер	Receipt sent to the printer
+Чек пуст	The receipt is empty
+Чек удалён из очереди	Receipt removed from the queue
+Чек уходит на принтер, как только продажа проведена	The receipt goes to the printer as soon as the sale is posted
+Чек №%s	Receipt №%s
+Чеки, которые ждут связи	Receipts waiting for a connection
+Чеки, которые ждут связи с сервером	Receipts waiting for a connection to the server
+Чеки, которые не удалось отправить на сервер, хранятся на этом устройстве и уйдут сами, как только появится связь. Продажа уже проведена: остаток списан, чек можно печатать.\n\nПовторная отправка безопасна — сервер узнаёт номер чека и не проводит его дважды.	Receipts that could not be sent to the server are kept on this device and will send themselves once there is a connection. The sale is already posted: stock is deducted and the receipt can be printed.\n\nResending is safe — the server recognises the receipt number and does not post it twice.
+Чеков	Receipts
+Что за товар	What the item is
+Чтобы продолжать проводить приход — выберите тариф.	To keep posting stock-ins, choose a plan.
+Чтобы продолжать продавать — выберите тариф.	To keep selling, choose a plan.
+Чтобы прочитать штрихкод, разрешите приложению доступ к камере.	To read a barcode, allow the app to use the camera.
+Чтобы увидеть список принтеров, нужен доступ к устройствам поблизости.	To see the list of printers, access to nearby devices is needed.
+Чёрный / 64 GB	Black / 64 GB
+Шаг продажи	Sale step
+Ширина ленты	Tape width
+Ширина ленты вашего термопринтера. Влияет на печать чеков с этого устройства.	The tape width of your thermal printer. Affects receipt printing from this device.
+Ширина ленты, автопечать и выбор Bluetooth-принтера	Tape width, auto-print and Bluetooth printer choice
+Штрихкод	Barcode
+Штрихкод %s не найден	Barcode %s not found
+Штрихкод подставлен	Barcode filled in
+Штрихкода нет	No barcode
+Штрихкодов: %s	Barcodes: %s
+Штрихкоды	Barcodes
+Штук	Pcs
+Штучный товар: продаётся целыми единицами.	Unit item: sold in whole units.
+Эти цифры создадут приход — он появится на странице «Приход».	These figures will create a stock-in — it will appear on the "Stock-in" page.
+Этикетки FonRo	FonRo labels
+Этикетки отправлены на принтер	Labels sent to the printer
+Это устройство	This device
+Это устройство не умеет Bluetooth	This device does not support Bluetooth
+Этот код уже у товара «%s»	This code already belongs to item "%s"
+Этот чек уже был проведён — повторно не списываем	This receipt has already been posted — no second deduction
+Я оплатил — обновить	I have paid — refresh
+Язык интерфейса	Interface language
+Язык кассы на этом устройстве. На чеки и этикетки не влияет.	Till language on this device. Does not affect receipts or labels.
+Язык каталога	Catalogue language
+а все его устройства потеряют доступ. Новый ключ надо будет передать лично.	and all their devices will lose access. The new key will have to be handed over in person.
+автор не указан	author not specified
+админ	admin
+адрес не настроен	address not set
+активен	active
+в документе	in the document
+в долг	on credit
+введите 6-значный код	enter the 6-digit code
+витрину	storefront
+включён	on
+владелец	owner
+возвраты %s на %s	returns %s for %s
+вс	Sun
+вт	Tue
+выключен	off
+заказ	order
+карта	card
+касса	till
+кассир	cashier
+категория	category
+клиент	customer
+магазин	shop
+менеджер	manager
+мобильная касса магазина	the shop's mobile till
+мы отправили код на %s	we sent a code to %s
+на %s. 	for %s. 
+на складе: 	in stock: 
+найдено по запросу	found for the query
+наклеек	label
+наклейка	label
+наклейки	label
+наличные	cash
+напр. Аренда	e.g. Rent
+настройки	settings
+не выбран	not selected
+необязательно	optional
+нет кода	no code
+нет сети · продажи сохраняются	no network · sales are being saved
+нет сети · чеков в очереди: %s	no network · receipts in queue: %s
+новый магазин в FonRo	a new shop in FonRo
+остаток, шт	stock, pcs
+остаток: %s %s	stock: %s %s
+отключён	disconnected
+отменён  	cancelled  
+отправляем чеки: %s	sending receipts: %s
+пн	Mon
+позиции	line
+позиций	line
+позиция	line
+позиция #%s	line #%s
+помидоры с базара, не продались…	tomatoes from the market, didn't sell…
+попытка	attempt
+попытки	attempt
+попыток	attempt
+прибыль %s	profit %s
+придумайте новый пароль	create a new password
+принтер не отвечает	printer not responding
+приход	stock-in
+прихода	stock-in
+приходов	stock-in
+пришлём код на вашу почту	we'll send a code to your email
+проведён	posted
+продаж	sale
+продажа	sale
+продажи	sale
+прочее	other
+пт	Fri
+расход	expense
+сб	Sat
+сегодня	today
+сотрудник	employee
+сотрудника	employee
+сотрудников	employee
+ср	Wed
+стандарт — как в iOS по умолчанию	standard — like the iOS default
+сум/мес	sum/month
+считаем по чекам…	counting by receipts…
+телефон не указан	no phone
+товар	item
+товара	item
+товаров	item
+уже есть	already exists
+уже не в магазине	no longer at the shop
+узкая лента	narrow tape
+указать	set
+чек	receipt
+чека	receipt
+чеков	receipt
+чт	Thu
+широкая лента	wide tape
+шт	pcs
+…и ещё %s	…and %s more
+← Назад ко входу	← Back to sign-in
+← Уже есть аккаунт? Войти	← Already have an account? Sign in
+⚙️ Настройки магазина	⚙️ Shop settings
+✅ Точка задана	✅ Point set
+✏️ Изменить ответ	✏️ Edit reply
+✓ Подтвердить	✓ Confirm
+⭐ FonRo Премиум	⭐ FonRo Premium
+⭐ Отзывы	⭐ Reviews
+＋ Списать товар	＋ Write off item
+🌐 Онлайн-магазин 	🌐 Online shop 
+🎟 Промокод %s: −%s%%	🎟 Promo code %s: −%s%%
+🏬 Отзыв о магазине	🏬 Shop review
+🏬 Самовывоз	🏬 Pickup
+💬 Ответить	💬 Reply
+💱 Валюта витрины	💱 Storefront currency
+💵 В кассу	💵 To the till
+📍 Локация магазина	📍 Shop location
+📤 Поделиться	📤 Share
+🔒 Бесплатный период закончился	🔒 The free period has ended
+🔗 Адрес витрины	🔗 Storefront address
+🗓 Календарь	🗓 Calendar
+🗓 Месяц	🗓 Month
+🚗 Доставка	🚗 Delivery
+🚚 Доставка	🚚 Delivery
+🚚 Магазин доставляет заказы	🚚 The shop delivers orders
+🧭 Открыть	🧭 Open
+🧾 Чеки	🧾 Receipts
+Аудит доступен сотрудникам с правом «Аудит». Историю проверок видно всем.	Stocktake is available to employees with the "Stocktake" right. The stocktake history is visible to everyone.
+Аудитов пока не было. Нажмите «Начать аудит».	There have been no stocktakes yet. Tap "Start stocktake".
+Аудитов по этому товару не было.	There have been no stocktakes for this item.
+Аудит проведён	Stocktake completed
+Провести аудит?	Post the stocktake?
+Нет права на аудит	No right to run a stocktake
+Новый аудит	New stocktake
+Начать аудит	Start stocktake
+Введите сумму оплаты	Enter the payment amount
+Внесено сейчас	Paid now
+Нет доступа для этого действия.	You do not have access for this action.
+Оплата меньше суммы чека	Payment is less than the receipt total
+Отложенные	On hold
+Подставить сумму	Fill in the amount
+Провести продажу	Complete the sale
+Провести продажу?	Complete the sale?
+Скидка на чек снята: стоят скидки на позиции	Receipt discount removed: item discounts are set
+Скидка съедает весь чек — к оплате 0	The discount covers the whole receipt — nothing to pay
+Скидки на позиции	Item discounts
+Сумма картой	Card amount
+Уже стоят скидки на позиции	Item discounts are already set
+Чем внесли сейчас	How it was paid now
+Мой доступ	My access
+Доступ	Access
+Открыть всё	Show everything
+Доступ открыт полностью	Full access restored
+Скрыто разделов:	Sections hidden:
+скрыто разделов:	sections hidden:
+открыто всё	everything is visible
+Управление	Management
+нельзя скрыть: отсюда всё и возвращается	cannot be hidden: this is where you turn everything back on
+Выключите разделы, которые не хотите показывать. Вы остаётесь владельцем — вернуть всё можно в один тап. Настройка действует на всех ваших устройствах.	Turn off the sections you do not want to show. You are still the owner — one tap brings everything back. The setting applies to all your devices.
+Спрячьте разделы на время показа — вы остаётесь владельцем	Hide sections while you demo — you are still the owner
+Виден	Visible
+Скрыт	Hidden
+Настройка сохранена	Setting saved
+скрыто разделов: %s	sections hidden: %s
+Скрыто разделов: %s	Sections hidden: %s

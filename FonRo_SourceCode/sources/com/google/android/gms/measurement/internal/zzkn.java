@@ -1,0 +1,30 @@
+package com.google.android.gms.measurement.internal;
+
+import android.os.Bundle;
+import android.text.TextUtils;
+import java.util.Objects;
+import kotlinx.coroutines.DebugKt;
+
+/* JADX INFO: Access modifiers changed from: package-private */
+/* compiled from: com.google.android.gms:play-services-measurement-impl@@23.2.0 */
+/* loaded from: classes5.dex */
+public final class zzkn implements zzpo {
+    final /* synthetic */ zzlj zza;
+
+    /* JADX INFO: Access modifiers changed from: package-private */
+    public zzkn(zzlj zzljVar) {
+        Objects.requireNonNull(zzljVar);
+        this.zza = zzljVar;
+    }
+
+    @Override // com.google.android.gms.measurement.internal.zzpo
+    public final void zza(String str, String str2, Bundle bundle) {
+        boolean isEmpty = TextUtils.isEmpty(str);
+        zzlj zzljVar = this.zza;
+        if (!isEmpty) {
+            zzljVar.zzH(DebugKt.DEBUG_PROPERTY_VALUE_AUTO, "_err", bundle, str);
+        } else {
+            zzljVar.zzA(DebugKt.DEBUG_PROPERTY_VALUE_AUTO, "_err", bundle);
+        }
+    }
+}

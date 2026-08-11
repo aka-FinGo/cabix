@@ -1,0 +1,23 @@
+package kotlin.text.jdk8;
+
+import androidx.constraintlayout.widget.ConstraintLayout;
+import kotlin.Metadata;
+import kotlin.jvm.internal.Intrinsics;
+import kotlin.text.MatchGroup;
+import kotlin.text.MatchGroupCollection;
+import kotlin.text.MatchNamedGroupCollection;
+
+/* compiled from: RegexExtensions.kt */
+@Metadata(d1 = {"\u0000\u0018\n\u0000\n\u0002\u0018\u0002\n\u0002\u0018\u0002\n\u0000\n\u0002\u0010\u000e\n\u0002\u0018\u0002\n\u0002\b\u0003\u001a&\u0010\u0000\u001a\u0004\u0018\u00010\u0001*\u00020\u00022\u0006\u0010\u0003\u001a\u00020\u0004H\u0087\u0082\u0004b\f\b\u0005\u0012\b\b\u0006\u0012\u0004\b\b(\u0007¨\u0006\b"}, d2 = {"get", "Lkotlin/text/MatchGroup;", "Lkotlin/text/MatchGroupCollection;", "name", "", "Lkotlin/SinceKotlin;", "version", "1.2", "kotlin-stdlib"}, k = 2, mv = {2, 4, 0}, pn = "kotlin.text", xi = ConstraintLayout.LayoutParams.Table.LAYOUT_CONSTRAINT_VERTICAL_CHAINSTYLE)
+/* loaded from: classes6.dex */
+public final class RegexExtensionsJDK8Kt {
+    public static final MatchGroup get(MatchGroupCollection matchGroupCollection, String name) {
+        Intrinsics.checkNotNullParameter(matchGroupCollection, "<this>");
+        Intrinsics.checkNotNullParameter(name, "name");
+        MatchNamedGroupCollection matchNamedGroupCollection = matchGroupCollection instanceof MatchNamedGroupCollection ? (MatchNamedGroupCollection) matchGroupCollection : null;
+        if (matchNamedGroupCollection == null) {
+            throw new UnsupportedOperationException("Retrieving groups by name is not supported on this platform.");
+        }
+        return matchNamedGroupCollection.get(name);
+    }
+}

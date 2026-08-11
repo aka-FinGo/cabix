@@ -1,0 +1,41 @@
+package com.google.android.gms.internal.measurement;
+
+import java.util.Iterator;
+import java.util.NoSuchElementException;
+import java.util.Objects;
+
+/* JADX INFO: Access modifiers changed from: package-private */
+/* compiled from: com.google.android.gms:play-services-measurement@@23.2.0 */
+/* loaded from: classes5.dex */
+public final class zzad implements Iterator {
+    final /* synthetic */ zzae zza;
+    private int zzb;
+
+    /* JADX INFO: Access modifiers changed from: package-private */
+    public zzad(zzae zzaeVar) {
+        Objects.requireNonNull(zzaeVar);
+        this.zza = zzaeVar;
+        this.zzb = 0;
+    }
+
+    @Override // java.util.Iterator
+    public final boolean hasNext() {
+        return this.zzb < this.zza.zzh();
+    }
+
+    @Override // java.util.Iterator
+    public final /* bridge */ /* synthetic */ Object next() {
+        zzae zzaeVar = this.zza;
+        int i = this.zzb;
+        int zzh = zzaeVar.zzh();
+        int i2 = this.zzb;
+        if (i < zzh) {
+            this.zzb = i2 + 1;
+            return zzaeVar.zzl(i2);
+        }
+        StringBuilder sb = new StringBuilder(String.valueOf(i2).length() + 21);
+        sb.append("Out of bounds index: ");
+        sb.append(i2);
+        throw new NoSuchElementException(sb.toString());
+    }
+}

@@ -1,0 +1,25 @@
+package com.google.android.gms.measurement.internal;
+
+import java.util.Objects;
+
+/* compiled from: com.google.android.gms:play-services-measurement@@23.2.0 */
+/* loaded from: classes5.dex */
+final class zzno implements Runnable {
+    final /* synthetic */ zzpg zza;
+    final /* synthetic */ Runnable zzb;
+
+    /* JADX INFO: Access modifiers changed from: package-private */
+    public zzno(zznt zzntVar, zzpg zzpgVar, Runnable runnable) {
+        this.zza = zzpgVar;
+        this.zzb = runnable;
+        Objects.requireNonNull(zzntVar);
+    }
+
+    @Override // java.lang.Runnable
+    public final void run() {
+        zzpg zzpgVar = this.zza;
+        zzpgVar.zzaa();
+        zzpgVar.zzZ(this.zzb);
+        zzpgVar.zzM();
+    }
+}

@@ -1,0 +1,22 @@
+package com.google.android.gms.internal.measurement;
+
+/* compiled from: com.google.android.gms:play-services-measurement-impl@@23.2.0 */
+/* loaded from: classes5.dex */
+public final class zznt extends zzadp implements zzafd {
+    private zznt() {
+        throw null;
+    }
+
+    /* JADX INFO: Access modifiers changed from: package-private */
+    public /* synthetic */ zznt(byte[] bArr) {
+        super(zznu.zzd());
+    }
+
+    public final zznt zza(String str, zznr zznrVar) {
+        str.getClass();
+        zznrVar.getClass();
+        zzaY();
+        ((zznu) this.zza).zzc().put(str, zznrVar);
+        return this;
+    }
+}

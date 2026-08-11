@@ -1,0 +1,10 @@
+node_modules/
+.idea/
+.gradle/
+build/
+*.tmp
+*.log
+*.zip
+*.apk
+graphify-out/
+old/
