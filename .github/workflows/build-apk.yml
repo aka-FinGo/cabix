@@ -36,7 +36,7 @@ jobs:
           zipalign -v -p 4 build/outputs/apk/FonRo-POS-unsigned.apk build/outputs/apk/FonRo-POS-aligned.apk
           
           keytool -genkey -v -keystore debug.keystore -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=FonRo,OU=FonRo,O=FonRo,L=Tashkent,C=UZ"
-          apksigner sign --ks debug.keystore --ks-pass pass:android --key-pass pass:android --out build/outputs/apk/FonRo-POS-v1.0.apk build/outputs/apk/FonRo-POS-aligned.apk
+          apksigner sign --ks debug.keystore --ks-pass pass:android --key-pass pass:android --min-sdk-version 24 --out build/outputs/apk/FonRo-POS-v1.0.apk build/outputs/apk/FonRo-POS-aligned.apk
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
